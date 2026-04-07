@@ -1,0 +1,132 @@
+﻿
+============================================================
+Processing: C. elegans
+============================================================
+Nodes: 297, Edges: 2148
+Computing baseline centralities...
+Running SIR simulations (500 runs per node)...
+  SIR labels: 50/297 nodes done
+  SIR labels: 100/297 nodes done
+  SIR labels: 150/297 nodes done
+  SIR labels: 200/297 nodes done
+  SIR labels: 250/297 nodes done
+  SIR labels: 297/297 nodes done
+SIR simulation completed in 7.5s
+
+Results for C. elegans:
+  Degree Centrality  Kendall Tau: 0.7472
+  K-Shell            Kendall Tau: 0.7683
+  Betweenness        Kendall Tau: 0.5723
+
+Top-3 Spread Evaluation:
+  Degree:      nodes=[np.int64(305), np.int64(71), np.int64(72)], spread=183
+  K-Shell:     nodes=[np.int64(1), np.int64(51), np.int64(72)], spread=93
+  Betweenness: nodes=[np.int64(305), np.int64(71), np.int64(72)], spread=187
+
+============================================================
+Processing: Budapest
+============================================================
+Nodes: 480, Edges: 989
+Computing baseline centralities...
+Running SIR simulations (500 runs per node)...
+  SIR labels: 50/480 nodes done
+  SIR labels: 100/480 nodes done
+  SIR labels: 150/480 nodes done
+  SIR labels: 200/480 nodes done
+  SIR labels: 250/480 nodes done
+  SIR labels: 300/480 nodes done
+  SIR labels: 350/480 nodes done
+  SIR labels: 400/480 nodes done
+  SIR labels: 450/480 nodes done
+  SIR labels: 480/480 nodes done
+SIR simulation completed in 3.8s
+
+Results for Budapest:
+  Degree Centrality  Kendall Tau: 0.5537
+  K-Shell            Kendall Tau: 0.6277
+  Betweenness        Kendall Tau: 0.2729
+
+Top-3 Spread Evaluation:
+  Degree:      nodes=[np.int64(504), np.int64(1010), np.int64(503)], spread=69
+  K-Shell:     nodes=[np.int64(1010), np.int64(1009), np.int64(662)], spread=42
+  Betweenness: nodes=[np.int64(503), np.int64(1009), np.int64(1010)], spread=37
+
+============================================================
+Processing: US Airports
+============================================================
+Nodes: 500, Edges: 2980
+Computing baseline centralities...
+Running SIR simulations (500 runs per node)...
+  SIR labels: 50/500 nodes done
+  SIR labels: 100/500 nodes done
+  SIR labels: 150/500 nodes done
+  SIR labels: 200/500 nodes done
+  SIR labels: 250/500 nodes done
+  SIR labels: 300/500 nodes done
+  SIR labels: 350/500 nodes done
+  SIR labels: 400/500 nodes done
+  SIR labels: 450/500 nodes done
+  SIR labels: 500/500 nodes done
+SIR simulation completed in 8.9s
+
+Results for US Airports:
+  Degree Centrality  Kendall Tau: 0.6503
+  K-Shell            Kendall Tau: 0.6898
+  Betweenness        Kendall Tau: 0.3592
+
+Top-3 Spread Evaluation:
+  Degree:      nodes=[np.int64(0), np.int64(1), np.int64(2)], spread=140
+  K-Shell:     nodes=[np.int64(0), np.int64(19), np.int64(21)], spread=127
+  Betweenness: nodes=[np.int64(55), np.int64(6), np.int64(5)], spread=65
+
+============================================================
+Processing: CargoShipsBB
+============================================================
+Nodes: 834, Edges: 4349
+Computing baseline centralities...
+Running SIR simulations (500 runs per node)...
+  SIR labels: 50/834 nodes done
+  SIR labels: 100/834 nodes done
+  SIR labels: 150/834 nodes done
+  SIR labels: 200/834 nodes done
+  SIR labels: 250/834 nodes done
+  SIR labels: 300/834 nodes done
+  SIR labels: 350/834 nodes done
+  SIR labels: 400/834 nodes done
+  SIR labels: 450/834 nodes done
+  SIR labels: 500/834 nodes done
+  SIR labels: 550/834 nodes done
+  SIR labels: 600/834 nodes done
+  SIR labels: 650/834 nodes done
+  SIR labels: 700/834 nodes done
+  SIR labels: 750/834 nodes done
+  SIR labels: 800/834 nodes done
+  SIR labels: 834/834 nodes done
+SIR simulation completed in 25.6s
+
+Results for CargoShipsBB:
+  Degree Centrality  Kendall Tau: 0.7874
+  K-Shell            Kendall Tau: 0.8246
+  Betweenness        Kendall Tau: 0.5957
+
+Top-3 Spread Evaluation:
+  Degree:      nodes=[np.int64(82), np.int64(56), np.int64(117)], spread=146
+  K-Shell:     nodes=[np.int64(99), np.int64(14), np.int64(4)], spread=184
+  Betweenness: nodes=[np.int64(82), np.int64(56), np.int64(167)], spread=223
+
+================================================================================
+FINAL SUMMARY ù Kendall Tau Correlations
+================================================================================
+Method                       C. elegans        Budapest     US Airports    CargoShipsBB
+--------------------------------------------------------------------------------
+Degree Centrality                0.7472          0.5537          0.6503          0.7874
+K-Shell                          0.7683          0.6277          0.6898          0.8246
+Betweenness                      0.5723          0.2729          0.3592          0.5957
+--------------------------------------------------------------------------------
+
+Top-3 Spread Evaluation:
+Method                       C. elegans        Budapest     US Airports    CargoShipsBB
+--------------------------------------------------------------------------------
+Degree Centrality                   183              69             140             146
+K-Shell                              93              42             127             184
+Betweenness                         187              37              65             223

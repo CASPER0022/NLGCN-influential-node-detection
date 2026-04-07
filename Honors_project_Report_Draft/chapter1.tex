@@ -1,0 +1,88 @@
+\chapter{Introduction}
+
+In real world systems, such as social networks, biological
+networks, transportation networks etc. , some nodes
+play a very important role in the propagation of
+information, influence, or disease \cite{hafiene2020, chen2012,
+farooq2018}. Identifying these \textit{influential nodes} is key
+challenge in the network science and has significant practical applications
+\cite{hafiene2020}. For instance, in viral marketing, targeting a small
+set of highly influential users can lead to large scale information
+spread \cite{hafiene2020, guo2026}, in epidemiology, immunizing key
+individuals can control the outbreak of a disease \cite{chen2012}.
+
+Traditional methods for finding the influential node depends on hand crafted
+centrality measures such as degree centrality,betweenness centrality \cite{farooq2018}, closeness centrality
+\cite{farooq2018}, and $k$-shell decomposition. While
+computationally efficient, these methods often fail to capture complex
+structural patterns, especially in weighted or heterogeneous graphs
+\cite{mukhtar, chen2012}. Simulation-based approaches such as the
+Susceptible-Infected-Recovered (SIR) model provide
+more accurate influence estimates, but are computationally expensive and
+do not scale to large networks \cite{guo2026, patel2025}.
+
+Recent advances in graph neural networks (GNNs) and convolutional
+learning on graphs \cite{zhang2019gcn} open new possibilities
+for learning node representations that encode rich structural information
+\cite{tu2025, patel2025}. This project proposes a novel framework, the
+\textbf{Neural Local Graph Convolutional Network (NLGCN)}, which
+combines structural feature engineering with deep learning to predict
+influential nodes in weighted graphs efficiently and accurately
+\cite{guo2026}.
+
+\section{Problem Statement}
+
+Given a weighted, undirected graph $G = (V, E)$, the goal is to assign
+an influence score to each node $v \in V$ such that nodes with higher
+scores are more likely to trigger large-scale information diffusion when
+selected as initial spreaders \cite{hafiene2020, chen2012}. The
+challenge lies in capturing both local neighbourhood structure and
+global network topology \cite{mukhtar, guo2026} without resorting to
+expensive simulation procedures at inference time \cite{patel2025}.
+
+\section{Objectives}
+
+The key objectives of this project are as follows:
+\begin{itemize}
+    \item To design structural feature descriptors --- Node Local
+    Influence (NLI) and Node Global Influence (NGI), that capture
+    multi-scale structural properties of nodes in weighted graphs
+    \cite{guo2026, mukhtar}.
+
+    \item To construct a multi-channel tensor representation for each
+    node by embedding these features into neighbourhood subgraph
+    matrices at three aggregation orders \cite{guo2026, tu2025}.
+
+    \item To design and train an attention-augmented convolutional neural
+    network (NLGCN) that predicts node influence scores from the tensor
+    representation \cite{ zhang2019gcn}.
+
+    \item To generate ground truth influence labels using the SIR
+    epidemic model and evaluate the proposed model
+    using Kendall Tau correlation and Top-$N$ spread
+    metrics \cite{guo2026}.
+\end{itemize}
+
+\section{Motivation}
+
+The motivation for this work stems from two key observations. First,
+existing centrality-based methods are inadequate for capturing the
+nuanced influence dynamics in weighted and complex networks
+\cite{chen2012, mukhtar, farooq2018}. Second, while GNN-based
+approaches have shown promise \cite{zhang2019gcn, patel2025},
+they typically require attribute-rich graphs or focus on classification
+tasks rather than influence ranking \cite{thotakura2024, tu2025}. The proposed NLGCN framework solves this issue by combining domain-specific
+structural features with the representational power of convolutional
+learning \cite{guo2026}, acquiring a fast, scalable, and accurate
+influential node detection.
+
+\section{Organization of the Report}
+
+The report is organized as follows. Chapter~2
+presents a review of existing approaches for influential node detection, including traditional centrality-based methods, deep learning techniques, and hybrid approaches. Chapter~3
+describes the proposed methodology in detail, covering graph
+representation, feature construction, model architecture, label
+generation, training procedure, and evaluation metrics. Chapter~4
+shows the experimental results and comparative analysis. Chapter~5
+discusses the findings and their implications. Chapter~6 concludes the
+report and outlines directions for future work.

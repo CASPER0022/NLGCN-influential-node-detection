@@ -1,0 +1,161 @@
+\documentclass[12pt,a4wide]{report}
+
+\usepackage{amsthm,amssymb,mathrsfs,setspace,amsmath}
+\usepackage{epsfig}
+\usepackage[nottoc]{tocbibind}
+\usepackage{graphicx}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\renewcommand{\chaptermark}[1]{\markboth{#1}{}}
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{notation}[theorem]{Notation}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\renewcommand{\baselinestretch}{1.5}
+
+\begin{document}
+
+% --------------- Title page -----------------------
+\begin{titlepage}
+\begin{center}
+
+\vspace*{1.5cm}
+
+{\Large \bf Influential Node Detection in Weighted Graphs\\[6pt] Using Graph Convolutional Networks}\\[2cm]
+
+A Project Report Submitted \\
+in Partial Fulfilment of the Requirements \\
+for the Degree of \\
+\vspace{4.5mm}
+{\Large \bf Bachelor of Technology (Honours)} \\
+in \\
+{\large \bf Computer Science with Specialization in AI and Data Science} \\
+
+\vspace{9mm}
+{\em by} \\ \vspace{2.5mm}
+{\large \bf Albin John} \\
+{\large \bf (Roll No. 2023BCD0005)}\\[.35in]
+
+\vfill
+
+\begin{figure}[h]
+  \begin{center}
+  \includegraphics[width=6cm, height=3cm]{logo2.jpg}
+  \end{center}
+\end{figure}
+\vspace*{0.2cm}
+{\em\large to }\\
+{\bf DEPARTMENT OF COMPUTER SCIENCE WITH}\\
+{\bf SPECIALIZATION IN AI AND DATA SCIENCE} \\
+{\bf INDIAN INSTITUTE OF INFORMATION TECHNOLOGY}\\
+{\bf KOTTAYAM-686635, INDIA}\\
+{\it April 2026}
+
+\end{center}
+\end{titlepage}
+
+\clearpage
+
+% --------------- Declaration page -----------------------
+\pagenumbering{roman} \setcounter{page}{2}
+\begin{center}
+{\large{\bf{DECLARATION}}}
+\end{center}
+
+\noindent I, \textbf{Albin John} (\textbf{Roll No: 2023BCD0005}), hereby declare that, this report entitled
+\textbf{``Influential Node Detection in Weighted Graphs using Graph Convolutional Networks''} submitted to Indian
+Institute of Information Technology Kottayam towards partial
+requirement of {\bf Bachelor of Technology (Honours)} in \textbf{Computer Science with Specialization in AI and Data Science}
+is an original work carried out by me under the supervision of
+\textbf{Dr. Jisha Mariyam John} and has not formed the basis for the award
+of any degree or diploma, in this or any other institution or
+university. I have sincerely tried to uphold the academic ethics
+and honesty. Whenever an external information or statement or
+result is used then, that have been duly acknowledged and cited.
+
+\vspace{4cm}
+
+\noindent Kottayam-686635 \hfill \textbf{Albin John}
+
+\noindent April 2026
+
+\clearpage
+
+% --------------- Certificate page -----------------------
+\pagenumbering{roman} \setcounter{page}{3}
+\begin{center}
+{\large{\bf{CERTIFICATE}}}
+\end{center}
+
+\noindent This is to certify that the work contained in this
+project report entitled \textbf{``Influential Node Detection in Weighted Graphs using Graph Convolutional Networks''}
+submitted by \textbf{Albin John} (\textbf{Roll No: 2023BCD0005}) to the Indian Institute of Information Technology Kottayam
+towards partial requirement of {\bf Bachelor of Technology (Honours)} in
+\textbf{Computer Science with Specialization in AI and Data Science} has been carried out by him under my
+supervision and that it has not been submitted elsewhere for the
+award of any degree.
+
+\vspace{4cm}
+
+\noindent Kottayam-686635 \hfill (Dr. Jisha Mariyam John)
+
+\noindent April 2026 \hfill Project Supervisor
+
+\clearpage
+
+% --------------- Abstract page -----------------------
+\begin{center}
+{\Large{\bf{ABSTRACT}}}
+\end{center}
+
+Identifying influential nodes in complex networks is a fundamental problem in network science. It has applications in viral marketing, epidemic control, and information diffusion. Recently, learning-based approaches such as Neural Local Graph Convolutional Networks (NLGCN) have shown impressive performance in predicting influential nodes in the graph.
+
+In this project, we implement and analyze the NLGCN framework for 
+identifying influential nodes in graphs. The model includes
+structural features such as Node Local Influence (NLI) and Node 
+Global Influence (NGI) that are computed at multiple aggregation scales to 
+construct a multi-channel representation for each node. A channel attention mechanism is implemented to learn the 
+relative importance of these features, followed by convolutional 
+layers to predict node influence scores.
+
+Ground truth labels are generated using the SIR epidemic diffusion 
+model , and performance is evaluated using 
+Kendall Tau correlation. The implementation 
+proves the effectiveness of learning-based approaches for 
+influence ranking and provides a foundation 
+for future enhancements.
+
+\clearpage
+\tableofcontents
+\clearpage
+\listoffigures
+\listoftables
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% =========== Main chapters ===========
+\input{chapter1.tex}
+\input{chapter2_litreview.tex}
+\input{chapter2.tex}
+\input{chapter3.tex}
+\input{chapter4.tex}
+\input{chapter5.tex}
+
+\bibliographystyle{plain}
+\bibliography{bib}
+
+\end{document}

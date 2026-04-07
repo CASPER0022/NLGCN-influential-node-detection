@@ -1,0 +1,162 @@
+\chapter{Discussion}
+
+This chapter interprets the experimental results presented in
+Chapter~4, discusses the limitations of the proposed NLGCN framework,
+and positions the work relative to existing methods in the literature.
+
+\section{Interpretation of Results}
+
+\subsection{Why NLGCN Outperforms Baseline Methods}
+
+The experimental results demonstrate that NLGCN consistently achieves
+higher Kendall Tau correlation than all three baseline centrality
+measures across all four datasets . Several factors
+explain this superior performance.
+
+First, traditional centrality measures such as degree centrality and K-Shell decomposition 
+rely on a single structural perspective. Degree centrality considers
+only immediate connections, while K-Shell assigns a single integer
+core number to each node, producing coarse rankings with many tied
+scores \cite{chen2012, mukhtar}. NLGCN, by contrast, constructs six
+structural channels, three based on Node Local Influence (NLI) and
+three based on Node Global Influence (NGI) at multiple aggregation
+orders, that jointly encode both local and global structural
+properties of each node. This richer
+representation allows the model to distinguish nodes that simple
+centrality measures would rank equally.
+
+Second, the multi-scale aggregation strategy captures hierarchical
+structural information that single-hop methods miss \cite{zhang2019gcn}. By constructing $W_{\text{NLI}1}$, $W_{\text{NLI}2}$,
+$W_{\text{NLI}3}$ and their NGI counterparts through iterative
+neighbourhood summation, the model encodes not only a node's own
+structural position but also the cumulative influence of its
+two-hop neighbourhood \cite{guo2026}. This is particularly beneficial
+in sparse networks such as Budapest (avg.\ degree 4.17), where local
+degree information alone is insufficient to distinguish influential
+nodes, explaining NLGCN's largest margin of improvement
+(+46.0\% over K-Shell) on that dataset.
+
+\subsection{Role of the Channel Attention Mechanism}
+
+The channel attention mechanism plays a critical
+role in NLGCN's performance by learning to weight the six structural
+channels dynamically. Not all channels contribute equally to influence
+prediction across different network types. In dense networks such as
+C.~elegans (avg.\ degree 14.46), higher-order NGI channels that
+capture long-range structural influence are likely upweighted, as
+global position matters more in well-connected graphs. In sparse
+networks like Budapest, local NLI channels may receive higher
+attention weights, since immediate neighbourhood structure is more
+discriminative when global paths are long.
+
+This adaptive weighting makes NLGCN more robust than fixed-weight
+approaches. Without the attention
+mechanism, all six channels would contribute equally to the
+convolution, reducing the model's ability to specialise its
+representation for different network structures.
+
+\section{Limitations}
+
+Despite its strong empirical performance, the proposed NLGCN
+framework has several limitations that should be acknowledged.
+
+\subsection{Scalability}
+
+The neighbourhood matrix construction requires selecting the top-$L$
+neighbours for each node and building a fixed-size subgraph
+representation \cite{guo2026, tu2025}. For the datasets used in this
+work (297--834 nodes), this is computationally feasible. However,
+for very large networks with tens of thousands or millions of nodes,
+this process becomes a bottleneck, as it requires computing all-pairs
+shortest path distances for NGI (complexity $O(n^3)$ with
+Floyd-Warshall or $O(nm)$ with Brandes' algorithm
+\cite{farooq2018, chen2012}). Extending NLGCN to large-scale networks
+would require approximations such as landmark-based distance
+estimation or sampling-based neighbourhood construction.
+
+\subsection{Sensitivity to Hyperparameters}
+
+The model's performance depends on the choice of $L$ (neighbourhood
+size) and $\alpha$ (balancing constant in NGI) \cite{guo2026}.
+A larger $L$ captures more structural context but increases the
+tensor size and computational cost. A poorly chosen $\alpha$ may
+over- or under-weight the degree contribution in the NGI formula.
+A grid search over these parameters, as performed in the original
+NLGCN paper \cite{guo2026}, would likely yield further performance
+improvements.
+
+
+\subsection{No Ablation Experiments}
+
+The current implementation does not include ablation experiments
+to isolate the contribution of individual components
+(attention mechanism, NLI channels, NGI channels, multi-scale
+aggregation). While the full model performs strongly, it is not
+possible to determine from the current results how much each
+component contributes independently \cite{guo2026, tu2025}.
+
+\subsection{Static Graph Assumption}
+
+The NLGCN framework assumes a static, unweighted, undirected graph.
+Real-world networks such as social networks and transportation
+systems are dynamic, nodes and edges are added or removed over
+time \cite{hafiene2020}. The current model does not account for
+temporal evolution of network structure, which may limit its
+applicability to time-varying influence prediction tasks.
+
+\section{Comparison with Related Work}
+
+\subsection{Heuristic Centrality Methods}
+
+Traditional methods for influential node detection including
+degree centrality, betweenness centrality,
+closeness centrality , and K-Shell decomposition are computationally efficient and interpretable,
+but have well-documented limitations \cite{chen2012, mukhtar}.
+They rely on a single structural dimension and fail to capture the
+multi-scale patterns that determine real spreading dynamics
+\cite{guo2026, thotakura2024}. The Mukhtar et al.\ \cite{mukhtar}
+analysis using ANOVA shows that no single centrality measure
+consistently outperforms others across different network types,
+motivating the need for combined or learning-based approaches.
+Chen et al.\ \cite{chen2012} demonstrated that semi-local
+centrality provides a better trade-off between computational
+complexity and ranking accuracy than global measures, but still
+falls short of learning-based methods on complex networks.
+
+\subsection{GNN-Based Approaches}
+
+Graph Neural Network-based methods \cite{zhang2019gcn}
+have advanced the state of the art in influence prediction by
+learning node representations directly from graph structure.
+InfGCN \cite{tu2025} and related models integrate centrality
+features as node attributes and process them through GCN layers,
+achieving improved ranking accuracy over heuristic baselines.
+Tu et al.\ \cite{tu2025} proposed CGCAN, which combines CNN and
+GNN modules with an attention mechanism, demonstrating that
+hybrid architectures that jointly capture local and global topology
+outperform single-path networks. Patel and Singh \cite{patel2025}
+proposed SE\_GCN, which uses structural equivalence and degree
+sequences to construct feature matrices processed by GCN layers,
+achieving strong Kendall Tau correlations on synthetic and
+real-world networks.
+
+NLGCN \cite{guo2026} is most directly related to these hybrid
+approaches. Its key distinction is the explicit construction of
+multi-scale NLI and NGI features embedded into neighbourhood
+matrices as image-like channels, enabling a standard 2D CNN
+to extract structural patterns without requiring a full GCN
+message-passing stack \cite{guo2026, zhang2019gcn}. This makes
+NLGCN computationally lighter at inference time compared to
+full GCN-based approaches, while still achieving competitive
+ranking accuracy.
+
+\subsection{Survey Perspective}
+
+Hafiene et al.\ \cite{hafiene2020} provide a comprehensive survey
+of influential node detection methods in both static and dynamic
+networks, categorizing approaches into heuristic, greedy, and
+hybrid methods. Their analysis highlights that static methods
+applied to dynamic networks lose performance over time, and that
+the most accurate approaches combine structural features with
+simulation-based ground truth,exactly the paradigm adopted
+by NLGCN.

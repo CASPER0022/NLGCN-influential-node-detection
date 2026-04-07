@@ -1,0 +1,193 @@
+\chapter{Experimental Results}
+
+This chapter presents the experimental evaluation of the proposed NLGCN
+framework on four real-world network datasets. The model is compared
+against three classical baseline centrality methods using Kendall Tau
+correlation and Top-$N$ spread evaluation via the SIR
+model \cite{ chen2012}.
+
+\section{Datasets}
+
+Experiments are conducted on four real-world benchmark networks of
+varying sizes and domains \cite{hafiene2020, farooq2018}. Table
+\ref{tab:datasets} summarizes the statistical properties of each
+dataset.
+
+\begin{table}[h]
+\centering
+\caption{Summary of Benchmark Datasets}
+\label{tab:datasets}
+\begin{tabular}{|l|c|c|c|l|}
+\hline
+\textbf{Dataset} & \textbf{Nodes} & \textbf{Edges} &
+\textbf{Avg. Degree} & \textbf{Network Type} \\
+\hline
+C. elegans    & 297 & 2{,}148 & 14.46 & Biological neural network \\
+Budapest      & 480 & 1{,}000 &  4.17 & Transportation network \\
+US Airports   & 500 & 2{,}980 & 11.92 & Airport route network \\
+CargoShipsBB  & 834 & 4{,}349 & 10.43 & Cargo shipping network \\
+\hline
+\end{tabular}
+\end{table}
+
+All datasets are treated as unweighted, undirected graphs. Average
+degree is computed as $2 \times |E| / |V|$. The Budapest network had
+11 self-loops removed during preprocessing. The datasets span a range
+of network sizes (297--834 nodes) and structural characteristics,
+from dense biological networks to sparse transportation graphs, enabling
+a comprehensive evaluation of the model's generalization ability.
+
+\section{Experimental Setup}
+
+\subsection{Framework and Hardware}
+
+All experiments are implemented in PyTorch (v2.11.0) with Python 3.10.9.
+Supporting libraries include NetworkX for graph operations, NumPy and
+SciPy for numerical computations, scikit-learn for preprocessing, and
+Matplotlib for visualization. All experiments are run on a local CPU
+(Windows) without GPU acceleration.
+
+
+\subsection{Hyperparameters}
+
+Table~\ref{tab:hyper} lists the hyperparameters used across all
+experiments.
+
+\begin{table}[h]
+\centering
+\caption{Hyperparameter Configuration}
+\label{tab:hyper}
+\begin{tabular}{|l|c|}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Learning Rate & 0.001 \\
+Optimizer & Adam \\
+Loss Function & MSELoss \\
+Epochs & 300 \\
+Input Channels & 6 (NLI + NGI at $L = 0, 1, 2$) \\
+SIR Runs (label generation) & 500 per node \\
+Infection Probability ($\beta$) & $1.5 \times \beta_c$ \\
+Recovery Probability ($\mu$) & 1 \\
+Input Normalization & Per-channel zero-mean, unit-variance \\
+Label Normalization & Min-max to $[0,1]$, then z-score \\
+\hline
+\end{tabular}
+\end{table}
+
+The epidemic threshold is computed as $\beta_c = \langle k \rangle /
+(\langle k^2 \rangle - \langle k \rangle)$,
+and the infection probability is set to $\beta = 1.5\,\beta_c$ to
+operate above the epidemic threshold, consistent with prior work
+\cite{guo2026, chen2012}.
+
+\subsection{Training Convergence}
+
+The model converges reliably across all datasets. Table
+\ref{tab:convergence} reports the MSE training loss at the start and
+end of training.
+
+\begin{table}[h]
+\centering
+\caption{Training Loss Convergence}
+\label{tab:convergence}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Dataset} & \textbf{Loss (Epoch 0)} &
+\textbf{Loss (Epoch 280)} \\
+\hline
+C. elegans   & 1.0288 & 0.0030 \\
+US Airports  & 1.8410 & 0.0018 \\
+Budapest     & 0.9689 & $<$0.01 \\
+CargoShipsBB & 1.0597 & $<$0.01 \\
+\hline
+\end{tabular}
+\end{table}
+
+The substantial reduction in loss (over 99\% reduction in all cases)
+confirms that the NLGCN model successfully learns to approximate
+SIR-based influence scores from structural features.
+
+\section{Baseline Methods}
+
+The proposed NLGCN is compared against three widely used centrality
+measures \cite{mukhtar, farooq2018}:
+
+\begin{itemize}
+    \item \textbf{Degree Centrality} : Ranks
+    nodes by the number of direct connections. Simple and
+    computationally efficient, but ignores global network structure.
+
+    \item \textbf{K-Shell Decomposition}: Assigns each
+    node a core number via iterative pruning. Nodes in higher-$k$
+    cores are considered more central. Captures some global structure
+    but produces coarse rankings with many tied scores.
+
+    \item \textbf{Betweenness Centrality} :
+    Measures how often a node lies on shortest paths between other node
+    pairs. Identifies bridge nodes but has $O(n^3)$ computational
+    complexity and does not directly measure spreading ability.
+\end{itemize}
+
+\section{Comparison with Baseline Methods}
+
+\subsection{Kendall Tau Correlation}
+
+Table~\ref{tab:kendall} presents the Kendall Tau correlation
+ between the rankings produced by each method and the
+ground truth SIR-based rankings.
+
+\begin{table}[h]
+\centering
+\caption{Kendall Tau Correlation Comparison on Benchmark Datasets}
+\label{tab:kendall}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Method} & \textbf{C. elegans} & \textbf{Budapest} &
+\textbf{US Airports} & \textbf{CargoShipsBB} \\
+\hline
+Degree Centrality         & 0.7472 & 0.5537 & 0.6503 & 0.7874 \\
+K-Shell                   & 0.7683 & 0.6277 & 0.6898 & 0.8246 \\
+Betweenness Centrality    & 0.5723 & 0.2729 & 0.3592 & 0.5957 \\
+\textbf{NLGCN} & \textbf{0.9627} & \textbf{0.9164} &
+\textbf{0.8944} & \textbf{0.9237} \\
+\hline
+\end{tabular}
+\end{table}
+
+NLGCN achieves the highest Kendall Tau on every dataset, with scores
+ranging from 0.8944 (US Airports) to 0.9627 (C. elegans). Several key
+observations are noted:
+
+\begin{itemize}
+    \item K-Shell is the strongest baseline (0.6277--0.8246), followed
+    by Degree Centrality (0.5537--0.7874). Betweenness Centrality
+    performs worst, particularly on sparse networks (Budapest: 0.2729).
+
+    \item NLGCN's advantage is most pronounced on the Budapest network
+    (+46.0\% over K-Shell), which is the sparsest dataset (avg. degree
+    4.17). This demonstrates the model's ability to capture structural
+    patterns that simple centrality measures miss in low-connectivity
+    settings.
+
+    \item Table~\ref{tab:improvement} quantifies the percentage
+    improvement of NLGCN over each baseline.
+\end{itemize}
+
+\begin{table}[h]
+\centering
+\caption{NLGCN Percentage Improvement Over Baseline Methods}
+\label{tab:improvement}
+\begin{tabular}{|l|c|c|c|c|}
+\hline
+\textbf{Baseline} & \textbf{C. elegans} & \textbf{Budapest} &
+\textbf{US Airports} & \textbf{CargoShipsBB} \\
+\hline
+vs Degree Centrality   & +28.8\% & +65.5\% & +37.5\% & +17.3\% \\
+vs K-Shell             & +25.3\% & +46.0\% & +29.7\% & +12.0\% \\
+vs Betweenness         & +68.2\% & +235.8\% & +149.0\% & +55.1\% \\
+\hline
+\end{tabular}
+\end{table}
+
+

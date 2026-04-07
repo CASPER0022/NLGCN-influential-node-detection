@@ -1,0 +1,141 @@
+\chapter{Conclusion and Future Work}
+
+\section{Conclusion}
+
+This project presented NLGCN, a novel learning-based framework for
+influential node detection in weighted graphs \cite{guo2026}. By
+combining local and global structural features, Node Local Influence
+(NLI) and Node Global Influence (NGI), at multiple aggregation
+scales and encoding them as a multi-channel tensor representation,
+the model captures rich structural information that traditional
+centrality measures such as degree centrality,
+K-Shell decomposition, and betweenness centrality
+ fail to exploit.
+
+A channel attention mechanism enables the model
+to dynamically weight the relative importance of each structural
+channel, adapting its representation to different network types
+without manual feature selection. Ground truth labels derived from
+the SIR epidemic diffusion model provide a
+realistic and simulation-validated measure of node influence. The
+trained NLGCN model achieves Kendall Tau correlations of 0.8944 to
+0.9627 across four real-world benchmark networks, significantly
+outperforming all baseline methods, and
+achieves perfect top-10 influential node identification on every
+dataset evaluated.
+
+The implementation demonstrates that combining domain-specific
+structural feature engineering with convolutional deep learning
+\cite{zhang2019gcn} yields a fast, scalable, and accurate
+approach to influence ranking, replacing expensive per-node SIR
+simulations at inference time with a single forward pass through
+the trained network \cite{guo2026, patel2025}.
+
+\section{Future Work}
+
+Several directions are identified for extending and strengthening
+the NLGCN framework. The most significant planned enhancement
+concerns the incorporation of edge weights, which is described
+first and in greatest detail.
+
+\subsection{Extension to Weighted Graphs}
+
+The current implementation treats all graphs as unweighted and
+undirected, representing edges as binary entries in the adjacency
+matrix \cite{guo2026}. This is a significant limitation, as most
+real-world networks are inherently weighted. In transportation
+networks, edge weights may represent distances or travel times;
+in social networks, they may encode interaction frequency or
+relationship strength; in biological networks, they may reflect
+the strength of synaptic connections or protein interaction
+confidence scores \cite{hafiene2020, thotakura2024}.
+
+Ignoring edge weights discards potentially critical information
+about node influence. A node connected to a few strong links
+may be more influential than one with many weak connections a distinction that the current binary adjacency matrix
+cannot capture \cite{mukhtar, chen2012}.
+
+Extending NLGCN to weighted graphs requires modifications at
+multiple stages of the pipeline \cite{guo2026, patel2025}:
+
+\begin{itemize}
+    \item \textbf{Weighted adjacency matrix:} Replace the binary
+    adjacency matrix $A_{ij} \in \{0, 1\}$ with a weighted matrix
+    $W_{ij} \in \mathbb{R}_{\geq 0}$, where $W_{ij}$ encodes the
+    edge weight between nodes $i$ and $j$ \cite{zhang2019gcn}.
+
+    \item \textbf{Weighted NLI:} The Node Local Influence formula
+    should incorporate edge weights into the neighbour contribution
+    term, replacing the binary existence of an edge with a
+    weighted influence score. Specifically, the exponential
+    aggregation over neighbours could be modified to:
+    \begin{equation}
+        \text{NLI}_i^{w} = \frac{d_w(v_i) \cdot
+        \log\!\left(\sum_{j \in N(i)} w_{ij} \cdot
+        \exp\!\left(d(v_j)\right)\right)}{n}
+    \end{equation}
+    where $d_w(v_i) = \sum_{j \in N(i)} w_{ij}$ is the weighted
+    degree (node strength) of node $i$ \cite{guo2026, mukhtar}.
+
+    \item \textbf{Weighted NGI:} The Node Global Influence formula
+    should use weighted shortest path distances rather than
+    hop-count distances, computed via Dijkstra's algorithm on
+    the weighted graph \cite{farooq2018, chen2012}:
+    \begin{equation}
+        \text{NGI}_i^{w} = \sum_{i \neq j}
+        \frac{\sqrt{d_w(v_j) + \alpha}}{d_{ij}^{w}}
+    \end{equation}
+    where $d_{ij}^{w}$ is the weighted shortest path distance
+    between nodes $i$ and $j$ \cite{guo2026}.
+
+    \item \textbf{Weighted neighbourhood matrix:} The neighbourhood
+    matrix used for channel construction should embed edge weights
+    in the off-diagonal entries, replacing the binary $\{0, 1\}$
+    encoding with the actual weight $w_{ij}$ \cite{tu2025, patel2025}.
+    This directly encodes link strength into the spatial
+    representation that the convolutional layers process.
+
+    \item \textbf{Weighted SIR labels:} The label generation
+    procedure should also reflect edge weights, with infection
+    probability $\beta_{ij} = \beta \cdot w_{ij}$ varying per
+    edge rather than being uniform across the network.
+\end{itemize}
+
+These modifications would allow NLGCN to fully exploit the
+information encoded in edge weights, likely yielding further
+improvements in ranking accuracy on real-world weighted networks
+\cite{guo2026, zhang2019gcn}.
+
+\subsection{Extension to Directed and Dynamic Graphs}
+
+The current framework assumes undirected, static graphs
+\cite{guo2026}. Real-world networks such as Twitter follower
+graphs, citation networks, and web graphs are directed, and many
+networks including social media platforms and transportation
+systems evolve over time \cite{hafiene2020}.
+
+
+
+\subsection{Exploring Alternative Diffusion Models}
+
+The current implementation uses the SIR epidemic model exclusively for ground truth label generation.
+While SIR is widely used in the influential node detection
+literature \cite{guo2026, chen2012}, other diffusion
+models such as the Independent Cascade (IC) model and the
+Linear Threshold (LT) model \cite{hafiene2020} capture
+different spreading dynamics and may be more appropriate for
+certain application domains such as viral marketing or opinion
+formation.
+
+\subsection{Scalability to Large Graphs}
+
+As discussed in Section~4.2, the current implementation becomes
+computationally expensive for very large graphs due to the
+all-pairs shortest path computation required for NGI
+\cite{guo2026, farooq2018}. Future work should explore
+approximate distance methods such as landmark-based shortest
+path estimation, graph sampling strategies similar to
+GraphSAGE, or hierarchical neighbourhood
+construction to reduce the $O(nm)$ complexity of distance
+computation while preserving ranking accuracy.
+

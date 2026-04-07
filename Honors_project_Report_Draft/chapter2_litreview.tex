@@ -1,0 +1,75 @@
+\chapter{Literature Review}
+
+This chapter presents a review of existing approaches for identifying influential nodes in complex networks, covering traditional centrality-based methods, deep learning techniques, and hybrid approaches. A comparative summary of existing work is also provided, followed by a discussion of the research gaps that motivate the present study.
+
+\section{Traditional Centrality-Based Approaches}
+
+Traditional methods for identifying influential nodes rely primarily on handcrafted centrality measures derived from the topological properties of networks. These measures quantify the importance of a node based on its structural position within the graph \cite{farooq2018, chen2012}.
+
+Farooq et al. \cite{farooq2018} examined the detection of influential nodes using social network analysis based on standard network metrics. Their study evaluated degree centrality, betweenness centrality, and closeness centrality, demonstrating that these metrics capture different aspects of node importance. Degree centrality measures the number of direct connections a node has, betweenness centrality quantifies the extent to which a node lies on shortest paths between other nodes, and closeness centrality reflects the average distance from a node to all other nodes in the network. While computationally efficient, the authors noted that relying on any single metric provides an incomplete picture of a node's true influence.
+
+Chen et al. \cite{chen2012} provided a systematic evaluation of various centrality measures and semi-local metrics for identifying influential nodes in complex networks. Their work highlighted that local measures such as degree centrality are computationally inexpensive but fail to capture the global positioning of nodes, whereas global measures like betweenness centrality offer better macroscopic insight at the cost of significantly higher computational complexity, rendering them unsuitable for large-scale networks.
+
+Mukhtar et al. \cite{mukhtar} conducted a comparative analysis of network centrality measures using ANOVA-based statistical testing. Their study demonstrated that different centrality metrics produce statistically distinct rankings for the same set of nodes, underscoring the inherent limitations of relying on a single topological descriptor for influence assessment and motivating the need for multi-feature approaches.
+
+Thotakura et al. \cite{thotakura2024} applied centrality measures alongside community detection algorithms in the context of Alzheimer's disease network analysis, demonstrating the applicability of traditional network science methods to biomedical domains. Their work showed that centrality measures can identify critical biomarkers and structural patterns in medical networks, further establishing the broad relevance of influential node identification.
+
+\section{Deep Learning Approaches}
+
+In recent years, deep learning has emerged as a powerful paradigm for learning from graph-structured data. Graph Convolutional Networks (GCNs) \cite{zhang2019gcn} have proven particularly effective for learning latent representations of nodes by recursively aggregating information from their local neighbourhoods. Unlike traditional methods that depend on predefined topological rules, GCNs can automatically learn optimal feature representations that encode both node-level attributes and graph-level structural information.
+
+Zhang et al. \cite{zhang2019gcn} provided a comprehensive review of graph convolutional network architectures, covering spectral and spatial approaches to graph convolution. Their survey highlighted the ability of GCNs to capture multi-hop neighbourhood information through layer-wise propagation, making them highly suitable for tasks such as node classification, link prediction, and influence ranking in complex networks.
+
+Hafiene et al. \cite{hafiene2020} presented an extensive survey on influential node detection in dynamic social networks. The survey reviewed methods ranging from static centrality measures to learning-based approaches and underscored the limitations of handcrafted features in dynamic and evolving networks. The authors highlighted that traditional top-$k$ ranking methods inevitably lose their effectiveness as graph structures grow in complexity and scale, motivating the adoption of data-driven learning techniques.
+
+Patel and Singh \cite{patel2025} proposed a graph convolutional network for structural equivalent key node identification in complex networks (SE-GCN). Their model aims to preserve the structural role and equivalence of nodes while identifying key nodes. Although highly effective, the method relies on the availability of informative node features and can struggle with purely topological graphs where node attributes are absent or uninformative.
+
+\section{Advanced and Hybrid Approaches}
+
+To overcome the individual limitations of traditional and deep learning methods, several researchers have proposed hybrid architectures that integrate handcrafted topological features with neural network models.
+
+Tu et al. \cite{tu2025} developed a hybrid CNN-GNN approach for identifying influential nodes in complex networks. Their method combines convolutional neural networks for capturing local compositional features with graph neural networks for encoding graph-level structural dependencies. This dual-pathway architecture demonstrated improved performance over both standalone CNN and GNN approaches, establishing the value of combining local and global structural information.
+
+Guo et al. \cite{guo2026} proposed a key node identification method based on hybrid centrality combinations and graph neural networks. Their approach constructs multi-channel representations of nodes using localized and aggregated influence features --- Node Local Influence (NLI) and Node Global Influence (NGI) --- computed at multiple aggregation scales. These structural channels are processed through an attention mechanism followed by convolutional layers to predict node influence scores. This methodology serves as the primary foundation for the Neural Local Graph Convolutional Network (NLGCN) framework implemented in this report.
+
+\section{Survey of Existing Work}
+
+Table~\ref{tab:litreview} provides a comparative overview of the key studies reviewed in this chapter, summarizing the method employed, the key idea, and the identified limitations.
+
+\begin{table}[h]
+\centering
+\caption{Summary of existing approaches for influential node identification}
+\label{tab:litreview}
+\footnotesize
+\begin{tabular}{|p{1.8cm}|p{2.2cm}|p{2.5cm}|p{3.5cm}|p{3.5cm}|}
+\hline
+\textbf{Paper} & \textbf{Method} & \textbf{Dataset} & \textbf{Key Idea} & \textbf{Limitation} \\
+\hline
+Chen et al. \cite{chen2012} & Centrality measures & Email, SIR-simulated networks & Semi-local and global metrics for influence ranking & Global metrics have high complexity; local metrics miss global view \\
+\hline
+Farooq et al. \cite{farooq2018} & Network metrics & Twitter, Facebook social networks & Degree, betweenness, closeness centrality for social networks & Single metrics provide incomplete picture \\
+\hline
+Mukhtar et al. \cite{mukhtar} & ANOVA-based comparison & Random and synthetic networks & Statistical comparison of centrality measures & Comparative only; does not propose a new method \\
+\hline
+Thotakura et al. \cite{thotakura2024} & Centrality + Community detection & Alzheimer's disease gene network & Network analysis for biomedical domain & Domain-specific; limited to biomedical networks \\
+\hline
+Zhang et al. \cite{zhang2019gcn} & GCN survey & N/A (Survey) & Comprehensive review of GCN architectures & Survey paper; no novel methodology \\
+\hline
+Hafiene et al. \cite{hafiene2020} & Survey of dynamic methods & N/A (Survey) & Methods for dynamic social networks & Survey paper; highlights gaps but does not fill them \\
+\hline
+Patel \& Singh \cite{patel2025} & SE-GCN & Karate, Dolphins, Football, Email, Power Grid & Structural equivalence-based key node identification & Requires informative node features \\
+\hline
+Tu et al. \cite{tu2025} & CNN-GNN hybrid & Karate, Dolphins, Jazz, Email & Combines local CNN and global GNN features & Computationally expensive for very large networks \\
+\hline
+Guo et al. \cite{guo2026} & Hybrid centrality + GNN & Karate, Dolphins, Jazz, Email, Power Grid & Multi-channel NLI/NGI with attention-augmented CNN & Limited evaluation on weighted graphs \\
+\hline
+\end{tabular}
+\end{table}
+
+\section{Research Gap}
+
+From the literature reviewed above, it is evident that significant progress has been made in the area of influential node identification using both conventional topological methods and advanced deep learning techniques. Nevertheless, several challenges remain.
+
+First, traditional centrality-based methods \cite{chen2012, farooq2018, mukhtar}, while computationally efficient, are inherently limited in their ability to capture complex and multi-scale structural patterns, particularly in weighted or heterogeneous networks. Second, existing GNN-based approaches \cite{patel2025, zhang2019gcn} often require attribute-rich graphs and may not perform well on purely topology-driven graphs where node features are absent. Third, while hybrid approaches such as the CNN-GNN model of Tu et al. \cite{tu2025} have shown promise, they typically focus on unweighted networks and do not explicitly account for edge weight information.
+
+The work of Guo et al. \cite{guo2026}, which serves as the primary inspiration for this project, introduced a powerful hybrid framework combining structural centrality features with convolutional learning. However, their evaluation was limited to unweighted networks. The present work addresses this gap by implementing and extending the NLGCN framework to weighted graphs, incorporating edge weight information into both the feature construction and the neighbourhood matrix formulation. The goal is to develop a fast, scalable, and accurate influential node detection system that works effectively on both weighted and unweighted networks.
