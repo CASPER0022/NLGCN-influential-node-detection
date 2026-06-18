@@ -28,7 +28,9 @@ training_datasets = [
     "Budapest.txt",     # 480 nodes
     "US_airports.txt",  # 500 nodes
     "Human12a.edge",    # 501 nodes
+    "synthetic_fragmented_1.txt", # 500 nodes (synthetic fragmented)
     "cargoshipsBB.txt", # 834 nodes
+    "synthetic_fragmented_2.txt", # 1000 nodes (synthetic fragmented)
     "E.coli.edge",      # 1100 nodes
     "netscience.mtx",   # 1461 nodes
     "open_flights.txt", # 2939 nodes
@@ -39,7 +41,7 @@ training_datasets = [
 
 # ---- NLGCN Model definition ----
 class ChannelAttention(nn.Module):
-    def __init__(self, channels=6, reduction=2):
+    def __init__(self, channels=7, reduction=2):
         super(ChannelAttention, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
@@ -58,8 +60,8 @@ class ChannelAttention(nn.Module):
 class NLGCN(nn.Module):
     def __init__(self):
         super(NLGCN, self).__init__()
-        self.attention = ChannelAttention(6)
-        self.conv1 = nn.Conv2d(6, 16, kernel_size=2)
+        self.attention = ChannelAttention(7)
+        self.conv1 = nn.Conv2d(7, 16, kernel_size=2)
         self.bn = nn.BatchNorm2d(16)
         self.pool = nn.MaxPool2d(2)
         # Using L=40 as specified by the paper (shape: 16 * 20 * 20)
@@ -225,6 +227,10 @@ def process_dataset(filepath, filename, L=40):
     if np.max(labels) > 0:
         labels = labels / np.max(labels)
 
+    # Pre-compute component sizes for all nodes
+    comp_dict = {node: len(c) for c in nx.connected_components(G) for node in c}
+    log_n_total = np.log10(n) if n > 1 else 1.0
+
     # 6. Neighborhood matrix extraction
     print("  -> Generating neighborhood channels...")
     channels = []
@@ -255,14 +261,21 @@ def process_dataset(filepath, filename, L=40):
         f5 = {n: W_NGI2[node_index[n]] if n is not None else 0 for n in nodes}
         f6 = {n: W_NGI3[node_index[n]] if n is not None else 0 for n in nodes}
 
+        f7 = {
+            node_in_window: np.log10(comp_dict.get(node_in_window, 1)) / log_n_total
+            if node_in_window is not None else 0
+            for node_in_window in nodes
+        }
+
         c1 = embed_channel(mat, nodes, f1)
         c2 = embed_channel(mat, nodes, f2)
         c3 = embed_channel(mat, nodes, f3)
         c4 = embed_channel(mat, nodes, f4)
         c5 = embed_channel(mat, nodes, f5)
         c6 = embed_channel(mat, nodes, f6)
+        c7 = embed_channel(mat, nodes, f7)
 
-        tensor = np.stack([c1, c2, c3, c4, c5, c6])
+        tensor = np.stack([c1, c2, c3, c4, c5, c6, c7])
         channels.append(tensor)
 
     channels = np.array(channels)

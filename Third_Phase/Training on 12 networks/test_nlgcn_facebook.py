@@ -16,12 +16,12 @@ torch.manual_seed(42)
 
 # Path resolution relative to script file
 script_dir = os.path.dirname(os.path.abspath(__file__))
-dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "NewSpain_18c_travelmap.gml"))
+dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "facebook_combined.txt"))
 model_path = os.path.join(script_dir, "nlgcn_model.pth")
 
 # ---- NLGCN Model Definition (Must match training script) ----
 class ChannelAttention(nn.Module):
-    def __init__(self, channels=7, reduction=2):
+    def __init__(self, channels=6, reduction=2):
         super(ChannelAttention, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
         self.fc = nn.Sequential(
@@ -40,8 +40,8 @@ class ChannelAttention(nn.Module):
 class NLGCN(nn.Module):
     def __init__(self):
         super(NLGCN, self).__init__()
-        self.attention = ChannelAttention(7)
-        self.conv1 = nn.Conv2d(7, 16, kernel_size=2)
+        self.attention = ChannelAttention(6)
+        self.conv1 = nn.Conv2d(6, 16, kernel_size=2)
         self.bn = nn.BatchNorm2d(16)
         self.pool = nn.MaxPool2d(2)
         self.fc1 = nn.Linear(16 * 20 * 20, 8)
@@ -58,12 +58,14 @@ class NLGCN(nn.Module):
         x = self.fc2(x)
         return x
 
-# ---- Graph Loader for GML format ----
+# ---- Graph Loader ----
 def load_graph(path):
-    print(f"Reading GML file from {path}...")
-    with open(path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    G = nx.parse_gml(lines, label='id')
+    print(f"Reading edges file from {path}...")
+    G = nx.Graph()
+    edges = np.loadtxt(path, dtype=int, usecols=(0, 1))
+    if edges.ndim == 1:
+        edges = edges.reshape(1, 2)
+    G.add_edges_from(edges)
     return G
 
 # ---- Optimized SIR Simulation ----
@@ -133,7 +135,7 @@ def main():
         print(f"Error: Trained model weights not found at {model_path}. Please complete training first.")
         sys.exit(1)
 
-    print("Loading NewSpain graph and calculating features...")
+    print("Loading Facebook graph and calculating features...")
     G = load_graph(dataset_path)
     nodelist = list(G.nodes())
     node_index = {node: i for i, node in enumerate(nodelist)}
@@ -141,6 +143,7 @@ def main():
     deg = np.array([G.degree(node) for node in nodelist])
 
     # 1. Compute Distance Matrix
+    print("Calculating shortest path lengths...")
     dist = dict(nx.all_pairs_shortest_path_length(G))
     dist_matrix = np.zeros((n, n))
     for i, u in enumerate(nodelist):
@@ -149,6 +152,7 @@ def main():
                 dist_matrix[i, j] = dist[u][v]
 
     # 2. Global Influence (NGI)
+    print("Computing Global Influence (NGI)...")
     alpha = 0.5
     NGI = np.zeros(n)
     for i in range(n):
@@ -158,6 +162,7 @@ def main():
             NGI[i] = np.sum(np.sqrt(deg[mask] + alpha) / dists[mask])
 
     # 3. Local Influence (NLI)
+    print("Computing Local Influence (NLI)...")
     K_hop = 3
     NLI = np.zeros(n)
     for i in range(n):
@@ -166,6 +171,7 @@ def main():
             NLI[i] = (deg[i] * np.log10(hop_count)) / n
 
     # 4. Multi-scale weight updates
+    print("Performing multi-scale updates...")
     A = nx.to_numpy_array(G, nodelist=nodelist)
     W_NLI1 = NLI.copy()
     W_NLI2 = W_NLI1 + A.dot(W_NLI1)
@@ -178,11 +184,8 @@ def main():
     NLI_dict = {node: NLI[i] for i, node in enumerate(nodelist)}
     NGI_dict = {node: NGI[i] for i, node in enumerate(nodelist)}
 
-    # Pre-compute component sizes for all nodes
-    comp_dict = {node: len(c) for c in nx.connected_components(G) for node in c}
-    log_n_total = np.log10(n) if n > 1 else 1.0
-
-    # 5. Extract neighborhood matrices (7 channels)
+    # 5. Extract neighborhood matrices (6 channels)
+    print("Generating neighborhood channels...")
     L = 40
     channels = []
     for node in nodelist:
@@ -207,11 +210,6 @@ def main():
         f4 = {n: NGI_dict.get(n, 0) for n in nodes}
         f5 = {n: W_NGI2[node_index[n]] if n is not None else 0 for n in nodes}
         f6 = {n: W_NGI3[node_index[n]] if n is not None else 0 for n in nodes}
-        f7 = {
-            node_in_window: np.log10(comp_dict.get(node_in_window, 1)) / log_n_total
-            if node_in_window is not None else 0
-            for node_in_window in nodes
-        }
 
         c1 = embed_channel(mat, nodes, f1)
         c2 = embed_channel(mat, nodes, f2)
@@ -219,9 +217,8 @@ def main():
         c4 = embed_channel(mat, nodes, f4)
         c5 = embed_channel(mat, nodes, f5)
         c6 = embed_channel(mat, nodes, f6)
-        c7 = embed_channel(mat, nodes, f7)
 
-        tensor = np.stack([c1, c2, c3, c4, c5, c6, c7])
+        tensor = np.stack([c1, c2, c3, c4, c5, c6])
         channels.append(tensor)
 
     X_test = np.array(channels)
@@ -318,7 +315,7 @@ def main():
 
     # Display results
     print("\n" + "="*70)
-    print("  NEWSPAIN 18TH CENTURY NETWORK MODEL PERFORMANCE EVALUATION")
+    print("  NEW FACEBOOK GRAPH MODEL PERFORMANCE EVALUATION")
     print("="*70)
     print(f"Nodes: {n} | Edges: {G.number_of_edges()}")
     print("-"*70)
