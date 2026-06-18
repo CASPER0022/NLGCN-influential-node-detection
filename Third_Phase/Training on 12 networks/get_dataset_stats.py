@@ -6,23 +6,30 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 datasets_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets"))
 
 
-# List of all 12 dataset files in the Datasets directory
-dataset_files = [
-    "Budapest.txt",
-    "C_elegans.txt",
-    "E.coli.edge",
-    "Human12a.edge",
-    "US_airports.txt",
-    "cargoshipsBB.txt",
-    "carrib.txt",
-    "cypedge.txt",
-    "netscience.mtx",
-    "open_flights.txt",
-    "out.advogato",
-    "out.foldoc"
+# List of all dataset files to check (including unseen test networks)
+datasets_to_check = [
+    ("Budapest.txt", False),
+    ("C_elegans.txt", False),
+    ("E.coli.edge", False),
+    ("Human12a.edge", False),
+    ("US_airports.txt", False),
+    ("cargoshipsBB.txt", False),
+    ("carrib.txt", False),
+    ("cypedge.txt", False),
+    ("netscience.mtx", False),
+    ("open_flights.txt", False),
+    ("out.advogato", False),
+    ("out.foldoc", False),
+    ("NewSpain_18c_travelmap.gml", True),         # Unseen GML test network
+    ("mammalia-voles-bhp-trapping.edges", True)     # Unseen Edges test network
 ]
 
 def load_graph(path):
+    if path.endswith(".gml"):
+        with open(path, 'r', encoding='utf-8') as f:
+            lines = f.readlines()
+        return nx.parse_gml(lines, label='id')
+        
     G = nx.Graph()
     try:
         # Try to load as integer values first
@@ -42,11 +49,15 @@ def load_graph(path):
     G.add_edges_from(edges)
     return G
 
-print(f"{'Dataset':<20} | {'Nodes (|N|)':<12} | {'Edges (|M|)':<12} | {'Avg Degree (<K>)':<16} | {'Max Degree':<10} | {'Avg CC (<CC>)':<14} | {'Density':<10}")
-print("-" * 105)
+print(f"{'Dataset':<35} | {'Nodes (|N|)':<12} | {'Edges (|M|)':<12} | {'Avg Deg (<K>)':<13} | {'Max Deg':<8} | {'Avg CC':<8} | {'Density':<8} | {'Hetero (kappa)':<15} | {'Components':<10}")
+print("-" * 145)
 
-for filename in dataset_files:
-    filepath = os.path.join(datasets_dir, filename)
+for filename, is_test in datasets_to_check:
+    if is_test:
+        filepath = os.path.join(datasets_dir, "Test", filename)
+    else:
+        filepath = os.path.join(datasets_dir, filename)
+        
     if not os.path.exists(filepath):
         print(f"Error: {filename} not found at {filepath}")
         continue
@@ -58,9 +69,13 @@ for filename in dataset_files:
         edges_count = G.number_of_edges()
         
         # Calculate degrees
-        degrees = [d for n, d in G.degree()]
-        avg_degree = np.mean(degrees) if degrees else 0
-        max_degree = np.max(degrees) if degrees else 0
+        degrees = np.array([d for n, d in G.degree()])
+        avg_degree = np.mean(degrees) if len(degrees) > 0 else 0
+        max_degree = np.max(degrees) if len(degrees) > 0 else 0
+        
+        # Calculate degree heterogeneity (kappa = <k^2> / <k>)
+        avg_k2 = np.mean(degrees**2) if len(degrees) > 0 else 0
+        kappa = avg_k2 / avg_degree if avg_degree > 0 else 0
         
         # Calculate clustering coefficient
         avg_cc = nx.average_clustering(G)
@@ -68,7 +83,12 @@ for filename in dataset_files:
         # Calculate density
         density = nx.density(G)
         
-        print(f"{filename:<20} | {nodes_count:<12} | {edges_count:<12} | {avg_degree:<16.4f} | {max_degree:<10} | {avg_cc:<14.4f} | {density:<10.4f}")
+        # Calculate connected components
+        num_components = nx.number_connected_components(G)
+        
+        # Mark test sets with a star for visibility
+        display_name = f"{filename} *" if is_test else filename
+        print(f"{display_name:<35} | {nodes_count:<12} | {edges_count:<12} | {avg_degree:<13.4f} | {max_degree:<8} | {avg_cc:<8.4f} | {density:<8.4f} | {kappa:<15.4f} | {num_components:<10}")
         
     except Exception as e:
         print(f"Error processing {filename}: {e}")

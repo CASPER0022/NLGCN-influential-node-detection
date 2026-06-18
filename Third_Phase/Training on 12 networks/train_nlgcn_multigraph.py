@@ -304,11 +304,19 @@ def main():
     X_std = X_train.std(axis=(0, 2, 3), keepdims=True)
     X_train = (X_train - X_mean) / (X_std + 1e-6)
 
+    # Save training statistics for leakage-free evaluation
+    np.save(os.path.join(script_dir, "X_mean.npy"), X_mean)
+    np.save(os.path.join(script_dir, "X_std.npy"), X_std)
+
     # Normalize labels
     y_train = y_train.reshape(-1, 1)
     y_mean = y_train.mean()
     y_std = y_train.std()
     y_train = (y_train - y_mean) / (y_std + 1e-6)
+
+    # Save label statistics
+    np.save(os.path.join(script_dir, "y_mean.npy"), y_mean)
+    np.save(os.path.join(script_dir, "y_std.npy"), y_std)
 
     # Convert to PyTorch tensors
     X_tensor = torch.tensor(X_train, dtype=torch.float32)

@@ -226,9 +226,13 @@ def main():
 
     X_test = np.array(channels)
 
-    # Normalize input features per channel
-    X_mean = X_test.mean(axis=(0, 2, 3), keepdims=True)
-    X_std = X_test.std(axis=(0, 2, 3), keepdims=True)
+    # Normalize input features per channel using global training statistics (leakage-free)
+    mean_file = os.path.join(script_dir, "X_mean.npy")
+    std_file = os.path.join(script_dir, "X_std.npy")
+    if not os.path.exists(mean_file) or not os.path.exists(std_file):
+        raise FileNotFoundError("Training statistics (X_mean.npy / X_std.npy) not found. Run train_nlgcn_multigraph.py first.")
+    X_mean = np.load(mean_file)
+    X_std = np.load(std_file)
     X_test = (X_test - X_mean) / (X_std + 1e-6)
 
     # 6. Load Trained NLGCN Model weights

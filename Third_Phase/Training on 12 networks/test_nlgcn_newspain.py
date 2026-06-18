@@ -16,7 +16,7 @@ torch.manual_seed(42)
 
 # Path resolution relative to script file
 script_dir = os.path.dirname(os.path.abspath(__file__))
-budapest_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Budapest.txt"))
+dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "NewSpain_18c_travelmap.gml"))
 model_path = os.path.join(script_dir, "nlgcn_model.pth")
 
 # ---- NLGCN Model Definition (Must match training script) ----
@@ -58,13 +58,12 @@ class NLGCN(nn.Module):
         x = self.fc2(x)
         return x
 
-# ---- Graph Loader ----
+# ---- Graph Loader for GML format ----
 def load_graph(path):
-    G = nx.Graph()
-    edges = np.loadtxt(path, dtype=int, usecols=(0, 1))
-    if edges.ndim == 1:
-        edges = edges.reshape(1, 2)
-    G.add_edges_from(edges)
+    print(f"Reading GML file from {path}...")
+    with open(path, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    G = nx.parse_gml(lines, label='id')
     return G
 
 # ---- Optimized SIR Simulation ----
@@ -134,8 +133,8 @@ def main():
         print(f"Error: Trained model weights not found at {model_path}. Please complete training first.")
         sys.exit(1)
 
-    print("Loading Budapest graph and calculating features...")
-    G = load_graph(budapest_path)
+    print("Loading NewSpain graph and calculating features...")
+    G = load_graph(dataset_path)
     nodelist = list(G.nodes())
     node_index = {node: i for i, node in enumerate(nodelist)}
     n = len(nodelist)
@@ -238,7 +237,7 @@ def main():
         pred = model(X_tensor).numpy().flatten()
 
     # 8. Run parallel SIR simulations for ground truth evaluation
-    print("Running parallel SIR simulations for ground truth spreading capacity...")
+    print("Running parallel SIR simulations for ground truth spreading capacity (SIR)...")
     k_avg = np.mean(deg)
     k2_avg = np.mean(deg**2)
     beta_c = k_avg / (k2_avg - k_avg) if (k2_avg - k_avg) != 0 else 0.1
@@ -251,71 +250,100 @@ def main():
     )
     labels = np.array(results)
 
-    # 9. Compute Kendall Tau correlation
-    tau, p = kendalltau(pred, labels)
-    print("\n" + "="*50)
-    print(f"Test Kendall Tau correlation (NLGCN vs SIR): {tau:.4f}")
-    print("="*50)
-
-    # 10. Compute Traditional Centrality Measures vs SIR
+    # 9. Compute traditional centrality measures
     print("\nCalculating traditional centrality measures...")
-    
-    # Create a clean copy of G without self-loops for traditional centrality measures
     G_clean = G.copy()
     G_clean.remove_edges_from(nx.selfloop_edges(G_clean))
-    
-    # Degree Centrality
+
     deg_cent = nx.degree_centrality(G_clean)
     deg_cent_vals = np.array([deg_cent[node] for node in nodelist])
-    tau_deg, _ = kendalltau(deg_cent_vals, labels)
     
-    # Closeness Centrality
     clos_cent = nx.closeness_centrality(G_clean)
     clos_cent_vals = np.array([clos_cent[node] for node in nodelist])
-    tau_clos, _ = kendalltau(clos_cent_vals, labels)
 
-    # Betweenness Centrality
     bet_cent = nx.betweenness_centrality(G_clean)
     bet_cent_vals = np.array([bet_cent[node] for node in nodelist])
-    tau_bet, _ = kendalltau(bet_cent_vals, labels)
 
-    # PageRank
     pr_cent = nx.pagerank(G_clean)
     pr_cent_vals = np.array([pr_cent[node] for node in nodelist])
-    tau_pr, _ = kendalltau(pr_cent_vals, labels)
 
-    # Coreness (K-core)
     core_cent = nx.core_number(G_clean)
     core_cent_vals = np.array([core_cent[node] for node in nodelist])
-    tau_core, _ = kendalltau(core_cent_vals, labels)
 
-    # Eigenvector Centrality (with fallback try-except)
     try:
         eig_cent = nx.eigenvector_centrality(G_clean, max_iter=1000)
         eig_cent_vals = np.array([eig_cent[node] for node in nodelist])
-        tau_eig, _ = kendalltau(eig_cent_vals, labels)
-        eig_str = f"{tau_eig:.4f}"
+        has_eig = True
     except Exception:
-        eig_str = "Failed to converge"
+        eig_cent_vals = np.zeros_like(labels)
+        has_eig = False
 
-    # Display comparison table
-    print("\n" + "-"*55)
-    print(f"{'Method / Centrality Measure':<30} | {'Kendall Tau (with SIR)':<20}")
-    print("-"*55)
-    print(f"{'Ours (NLGCN GNN)':<30} | {tau:<20.4f}")
-    print(f"{'Degree Centrality':<30} | {tau_deg:<20.4f}")
-    print(f"{'Closeness Centrality':<30} | {tau_clos:<20.4f}")
-    print(f"{'Betweenness Centrality':<30} | {tau_bet:<20.4f}")
-    print(f"{'PageRank':<30} | {tau_pr:<20.4f}")
-    print(f"{'Coreness (K-core)':<30} | {tau_core:<20.4f}")
-    print(f"{'Eigenvector Centrality':<30} | {eig_str:<20}")
-    print("-"*55)
+    # 10. Compute Kendall Tau correlations
+    # A: Prediction vs SIR
+    tau_pred_sir, _ = kendalltau(pred, labels)
+    
+    # B: Prediction vs Traditional Centrality Measures
+    tau_pred_deg, _ = kendalltau(pred, deg_cent_vals)
+    tau_pred_clos, _ = kendalltau(pred, clos_cent_vals)
+    tau_pred_bet, _ = kendalltau(pred, bet_cent_vals)
+    tau_pred_pr, _ = kendalltau(pred, pr_cent_vals)
+    tau_pred_core, _ = kendalltau(pred, core_cent_vals)
+    if has_eig:
+        tau_pred_eig, _ = kendalltau(pred, eig_cent_vals)
+        eig_pred_str = f"{tau_pred_eig:.4f}"
+    else:
+        eig_pred_str = "Failed to converge"
+
+    # C: Centrality Measures vs SIR
+    tau_deg_sir, _ = kendalltau(deg_cent_vals, labels)
+    tau_clos_sir, _ = kendalltau(clos_cent_vals, labels)
+    tau_bet_sir, _ = kendalltau(bet_cent_vals, labels)
+    tau_pr_sir, _ = kendalltau(pr_cent_vals, labels)
+    tau_core_sir, _ = kendalltau(core_cent_vals, labels)
+    if has_eig:
+        tau_eig_sir, _ = kendalltau(eig_cent_vals, labels)
+        eig_sir_str = f"{tau_eig_sir:.4f}"
+    else:
+        eig_sir_str = "Failed to converge"
+
+    # Display results
+    print("\n" + "="*70)
+    print("  NEWSPAIN 18TH CENTURY NETWORK MODEL PERFORMANCE EVALUATION")
+    print("="*70)
+    print(f"Nodes: {n} | Edges: {G.number_of_edges()}")
+    print("-"*70)
+    print(f"Model (NLGCN GNN) vs SIR ground truth Kendall Tau: {tau_pred_sir:.4f}")
+    print("-"*70)
+    
+    print("\nTable 1: Correlation of NLGCN Predictions & Centrality Measures with SIR")
+    print("-"*70)
+    print(f"{'Method / Centrality Measure':<30} | {'Kendall Tau with SIR':<30}")
+    print("-"*70)
+    print(f"{'Ours (NLGCN GNN)':<30} | {tau_pred_sir:<30.4f}")
+    print(f"{'Degree Centrality':<30} | {tau_deg_sir:<30.4f}")
+    print(f"{'Closeness Centrality':<30} | {tau_clos_sir:<30.4f}")
+    print(f"{'Betweenness Centrality':<30} | {tau_bet_sir:<30.4f}")
+    print(f"{'PageRank':<30} | {tau_pr_sir:<30.4f}")
+    print(f"{'Coreness (K-core)':<30} | {tau_core_sir:<30.4f}")
+    print(f"{'Eigenvector Centrality':<30} | {eig_sir_str:<30}")
+    print("-"*70)
+
+    print("\nTable 2: Correlation of NLGCN Predictions with Traditional Centrality Measures")
+    print("-"*70)
+    print(f"{'Centrality Measure':<30} | {'Kendall Tau with NLGCN Prediction':<30}")
+    print("-"*70)
+    print(f"{'Degree Centrality':<30} | {tau_pred_deg:<30.4f}")
+    print(f"{'Closeness Centrality':<30} | {tau_pred_clos:<30.4f}")
+    print(f"{'Betweenness Centrality':<30} | {tau_pred_bet:<30.4f}")
+    print(f"{'PageRank':<30} | {tau_pred_pr:<30.4f}")
+    print(f"{'Coreness (K-core)':<30} | {tau_pred_core:<30.4f}")
+    print(f"{'Eigenvector Centrality':<30} | {eig_pred_str:<30}")
+    print("-"*70)
 
     # 11. Ranking evaluation (Top-15 predicted nodes vs Top-15 SIR nodes)
     ranking_pred = np.argsort(pred)[::-1]
     ranking_true = np.argsort(labels)[::-1]
 
-    # Convert nodes to standard python ints for clean display
     top_pred_nodes = [int(nodelist[idx]) for idx in ranking_pred[:15]]
     top_true_nodes = [int(nodelist[idx]) for idx in ranking_true[:15]]
 
