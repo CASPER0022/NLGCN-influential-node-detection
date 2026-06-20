@@ -92,6 +92,8 @@ def load_graph(path):
     if edges.ndim == 1:
         edges = edges.reshape(1, 2)
     G.add_edges_from(edges)
+    # Remove self-loops
+    G.remove_edges_from(nx.selfloop_edges(G))
     return G
 
 # ---- Optimized SIR Simulation ----
