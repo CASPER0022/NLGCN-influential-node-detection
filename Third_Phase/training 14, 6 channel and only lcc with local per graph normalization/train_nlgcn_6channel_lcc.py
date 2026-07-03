@@ -8,38 +8,37 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
+from scipy.stats import kendalltau
 from joblib import Parallel, delayed
 
-# Set random seeds for reproducibility
+# Set seeds for reproducibility
 random.seed(42)
 np.random.seed(42)
 torch.manual_seed(42)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed_all(42)
 
-# Get current script path for robust relative execution
+# Path resolution relative to script file
 script_dir = os.path.dirname(os.path.abspath(__file__))
 datasets_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets"))
 
+# 14 Training networks
 training_datasets = [
-    "cypedge.txt",      # 65 nodes
-    "carrib.txt",       # 249 nodes
-    "C_elegans.txt",    # 297 nodes
-    "Budapest.txt",     # 480 nodes
-    "US_airports.txt",  # 500 nodes
-    "Human12a.edge",    # 501 nodes
-    "synthetic_realworld_1.txt", # 500 nodes (BA Scale-free)
-    "cargoshipsBB.txt", # 834 nodes
-    "synthetic_realworld_2.txt", # 1000 nodes (WS Small-world)
-    "E.coli.edge",      # 1100 nodes
-    "netscience.mtx",   # 1461 nodes
-    "open_flights.txt", # 2939 nodes
-    "out.advogato",     # 6539 nodes
-    "out.foldoc"        # 13356 nodes
+    "cypedge.txt",
+    "carrib.txt",
+    "C_elegans.txt",
+    "Budapest.txt",
+    "US_airports.txt",
+    "Human12a.edge",
+    "synthetic_realworld_1.txt",
+    "cargoshipsBB.txt",
+    "synthetic_realworld_2.txt",
+    "E.coli.edge",
+    "netscience.mtx",
+    "open_flights.txt",
+    "out.advogato",
+    "out.foldoc"
 ]
 
-
-# ---- NLGCN Model definition (6 Channels) ----
+# ---- NLGCN Model Definition (6 Channels) ----
 class ChannelAttention(nn.Module):
     def __init__(self, channels=6, reduction=2):
         super(ChannelAttention, self).__init__()
@@ -64,7 +63,6 @@ class NLGCN(nn.Module):
         self.conv1 = nn.Conv2d(6, 16, kernel_size=2)
         self.bn = nn.BatchNorm2d(16)
         self.pool = nn.MaxPool2d(2)
-        # Using L=40 as specified by the paper (shape: 16 * 20 * 20)
         self.fc1 = nn.Linear(16 * 20 * 20, 8)
         self.fc2 = nn.Linear(8, 1)
 
@@ -79,7 +77,6 @@ class NLGCN(nn.Module):
         x = self.fc2(x)
         return x
 
-
 # ---- Graph Loader ----
 def load_graph(path):
     G = nx.Graph()
@@ -87,16 +84,14 @@ def load_graph(path):
         edges = np.loadtxt(path, dtype=int, usecols=(0, 1))
     except Exception:
         edges_str = np.loadtxt(path, dtype=str, usecols=(0, 1))
-        cleaned = [[int(node.replace('V', '')) for node in row] for row in edges_str]
+        cleaned = [[int(node.replace('V', '').replace('v', '')) for node in row] for row in edges_str]
         edges = np.array(cleaned)
     
     if edges.ndim == 1:
         edges = edges.reshape(1, 2)
     G.add_edges_from(edges)
-    # Remove self-loops
     G.remove_edges_from(nx.selfloop_edges(G))
     return G
-
 
 # ---- Optimized SIR Simulation ----
 def SIR_simulation(G, seed, beta, mu, steps=1000):
@@ -134,7 +129,6 @@ def single_node_sir(G, seed, beta, mu, runs=500):
         spread += SIR_simulation(G, seed, beta, mu)
     return spread / runs
 
-
 # ---- Optimized Channel Feature Embedding ----
 def embed_channel(mat, nodes, feature_dict):
     size = mat.shape[0]
@@ -145,22 +139,17 @@ def embed_channel(mat, nodes, feature_dict):
             u = nodes[i]
             v = nodes[j]
 
-            # diagonal (i == j) -> self feature
             if i == j:
                 out[i, j] = feature_dict.get(u, 0)
-            # first row (i == 0, j > 0) -> a_1j * W_j
             elif i == 0 and j > 0:
                 if mat[i, j] == 1:
                     out[i, j] = feature_dict.get(v, 0)
-            # first column (j == 0, i > 0) -> a_i1 * W_i
             elif j == 0 and i > 0:
                 if mat[i, j] == 1:
                     out[i, j] = feature_dict.get(u, 0)
-            # otherwise -> raw adjacency value a_ij
             else:
                 out[i, j] = mat[i, j]
     return out
-
 
 # ---- Process a Single Graph Dataset (Filtering to LCC only) ----
 def process_dataset(filepath, filename, L=40, precalculated_y=None):
@@ -179,10 +168,9 @@ def process_dataset(filepath, filename, L=40, precalculated_y=None):
     node_index = {node: i for i, node in enumerate(nodelist)}
     n = len(nodelist)
     deg = np.array([G.degree(node) for node in nodelist])
-    
     print(f"  -> LCC Nodes: {n} (out of {G_raw.number_of_nodes()}) | LCC Edges: {G.number_of_edges()}")
 
-    # 1. Compute Distance Matrix (LCC paths only)
+    # 1. Distance Matrix (LCC only)
     print("  -> Calculating shortest paths within LCC...")
     dist = dict(nx.all_pairs_shortest_path_length(G))
     dist_matrix = np.zeros((n, n))
@@ -191,7 +179,7 @@ def process_dataset(filepath, filename, L=40, precalculated_y=None):
             if i != j and v in dist[u]:
                 dist_matrix[i, j] = dist[u][v]
 
-    # 2. Vectorized NGI (Global Influence)
+    # 2. Global Influence (NGI)
     print("  -> Computing Global Influence (NGI)...")
     alpha = 0.5
     NGI = np.zeros(n)
@@ -201,7 +189,7 @@ def process_dataset(filepath, filename, L=40, precalculated_y=None):
         if np.any(mask):
             NGI[i] = np.sum(np.sqrt(deg[mask] + alpha) / dists[mask])
 
-    # 3. Vectorized NLI (Local Influence)
+    # 3. Local Influence (NLI)
     print("  -> Computing Local Influence (NLI)...")
     K_hop = 3
     NLI = np.zeros(n)
@@ -294,6 +282,13 @@ def process_dataset(filepath, filename, L=40, precalculated_y=None):
         channels.append(tensor)
 
     channels = np.array(channels)
+    
+    # ---- LOCAL PER-GRAPH NORMALIZATION ----
+    # Normalize features locally per graph (Instance Normalization)
+    X_mean = channels.mean(axis=(0, 2, 3), keepdims=True)
+    X_std = channels.std(axis=(0, 2, 3), keepdims=True)
+    channels = (channels - X_mean) / (X_std + 1e-6)
+
     return channels, labels
 
 
@@ -316,25 +311,26 @@ def main():
             print(f"Warning: {filename} not found at {filepath}, skipping.")
             continue
         
-        cache_x_path = os.path.join(results_dir, f"{filename}_X.npy")
+        # Note: We now save the local-normalized features to local-normalized cache files
+        cache_x_path = os.path.join(results_dir, f"{filename}_local_norm_X.npy")
         cache_y_path = os.path.join(results_dir, f"{filename}_y.npy")
         
         try:
             if os.path.exists(cache_x_path) and os.path.exists(cache_y_path):
-                print(f"Loading cached LCC features and SIR labels for {filename}...")
+                print(f"Loading cached local-normalized features and SIR labels for {filename}...")
                 X = np.load(cache_x_path)
                 y = np.load(cache_y_path)
             elif os.path.exists(cache_y_path):
-                print(f"Loading cached SIR labels for {filename} and regenerating LCC features...")
+                print(f"Loading cached SIR labels for {filename} and regenerating local-normalized features...")
                 y = np.load(cache_y_path)
                 X, _ = process_dataset(filepath, filename, precalculated_y=y)
                 np.save(cache_x_path, X)
-                print(f"Regenerated LCC features saved to {cache_x_path}.")
+                print(f"Regenerated local-normalized features saved to {cache_x_path}.")
             else:
                 X, y = process_dataset(filepath, filename)
                 np.save(cache_x_path, X)
                 np.save(cache_y_path, y)
-                print(f"Cached LCC features and SIR labels for {filename} saved to {results_dir}.")
+                print(f"Cached local-normalized features and SIR labels for {filename} saved to {results_dir}.")
             all_X.append(X)
             all_y.append(y)
         except Exception as e:
@@ -344,20 +340,11 @@ def main():
         print("No datasets were successfully processed. Exiting.")
         sys.exit(1)
 
-    # Combine data from all datasets
+    # Combine data from all datasets (all are already normalized locally!)
     X_train = np.concatenate(all_X, axis=0)
     y_train = np.concatenate(all_y, axis=0)
 
-    # ---- Normalization per channel across all combined nodes ----
-    X_mean = X_train.mean(axis=(0, 2, 3), keepdims=True)
-    X_std = X_train.std(axis=(0, 2, 3), keepdims=True)
-    X_train = (X_train - X_mean) / (X_std + 1e-6)
-
-    # Save training statistics for leakage-free evaluation in the same folder
-    np.save(os.path.join(script_dir, "X_mean.npy"), X_mean)
-    np.save(os.path.join(script_dir, "X_std.npy"), X_std)
-
-    # Normalize labels
+    # Normalize labels globally
     y_train = y_train.reshape(-1, 1)
     y_mean = y_train.mean()
     y_std = y_train.std()

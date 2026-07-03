@@ -16,7 +16,7 @@ torch.manual_seed(42)
 
 # Path resolution relative to script file
 script_dir = os.path.dirname(os.path.abspath(__file__))
-dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "mammalia-voles-bhp-trapping.edges"))
+dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "dolphins.txt"))
 model_path = os.path.join(script_dir, "nlgcn_model.pth")
 results_dir = os.path.abspath(os.path.join(script_dir, "..", "results"))
 os.makedirs(results_dir, exist_ok=True)
@@ -68,7 +68,7 @@ def load_graph(path):
         edges = np.loadtxt(path, dtype=int, usecols=(0, 1))
     except Exception:
         edges_str = np.loadtxt(path, dtype=str, usecols=(0, 1))
-        cleaned = [[int(node.replace('V', '')) for node in row] for row in edges_str]
+        cleaned = [[int(node.replace('V', '').replace('v', '')) for node in row] for row in edges_str]
         edges = np.array(cleaned)
     
     if edges.ndim == 1:
@@ -136,7 +136,7 @@ def embed_channel(mat, nodes, feature_dict):
     return out
 
 def get_lcc_subgraph(G_raw):
-    components = sorted(nx.connected_components(G_raw), key=len, reverse=True)
+    components = sorted(nx.connected_connected_components(G_raw) if hasattr(nx, 'connected_connected_components') else nx.connected_components(G_raw), key=len, reverse=True)
     return G_raw.subgraph(components[0]).copy()
 
 def main():
@@ -145,7 +145,7 @@ def main():
         sys.exit(1)
 
     filename = os.path.basename(dataset_path)
-    cache_x_path = os.path.join(results_dir, f"{filename}_X.npy")
+    cache_x_path = os.path.join(results_dir, f"{filename}_local_norm_X.npy")
     cache_y_path = os.path.join(results_dir, f"{filename}_y.npy")
 
     # Load and filter graph to LCC
@@ -159,7 +159,7 @@ def main():
 
     # Check cache for pre-saved X and y
     if os.path.exists(cache_x_path) and os.path.exists(cache_y_path):
-        print("Loading precalculated features and labels from cache...")
+        print("Loading precalculated local-normalized features and labels from cache...")
         X_test = np.load(cache_x_path)
         labels = np.load(cache_y_path)
     else:
@@ -272,18 +272,15 @@ def main():
             labels = np.array(results)
             np.save(cache_y_path, labels)
 
-        # Save X_test to cache
-        np.save(cache_x_path, X_test)
-        print(f"Calculated results saved to cache inside {results_dir}")
+        # ---- LOCAL PER-GRAPH NORMALIZATION ----
+        # Normalize test features locally per graph
+        X_mean = X_test.mean(axis=(0, 2, 3), keepdims=True)
+        X_std = X_test.std(axis=(0, 2, 3), keepdims=True)
+        X_test = (X_test - X_mean) / (X_std + 1e-6)
 
-    # Normalize input features per channel using global training statistics
-    mean_file = os.path.join(script_dir, "X_mean.npy")
-    std_file = os.path.join(script_dir, "X_std.npy")
-    if not os.path.exists(mean_file) or not os.path.exists(std_file):
-        raise FileNotFoundError("Training statistics (X_mean.npy / X_std.npy) not found. Run train_nlgcn_6channel_lcc.py first.")
-    X_mean = np.load(mean_file)
-    X_std = np.load(std_file)
-    X_test = (X_test - X_mean) / (X_std + 1e-6)
+        # Save local-normalized X_test to cache
+        np.save(cache_x_path, X_test)
+        print(f"Calculated local-normalized features saved to cache inside {results_dir}")
 
     # Load Trained NLGCN Model weights
     print(f"Loading 6-channel NLGCN model weights from {model_path}...")
@@ -349,14 +346,17 @@ def main():
 
         return {
             "k": k,
-            "GNN": tau_pred,
-            "Degree": tau_deg,
-            "Closeness": tau_clos,
-            "Betweenness": tau_bet,
-            "PageRank": tau_pr,
-            "Coreness": tau_core,
-            "Eigenvector": tau_eig
+            "GNN": pointer_or_nan(tau_pred),
+            "Degree": pointer_or_nan(tau_deg),
+            "Closeness": pointer_or_nan(tau_clos),
+            "Betweenness": pointer_or_nan(tau_bet),
+            "PageRank": pointer_or_nan(tau_pr),
+            "Coreness": pointer_or_nan(tau_core),
+            "Eigenvector": pointer_or_nan(tau_eig)
         }
+
+    def pointer_or_nan(v):
+        return v if v is not None else np.nan
 
     res10 = get_correlations(10)
     res20 = get_correlations(20)
@@ -368,7 +368,7 @@ def main():
 
     # Display results
     print("\n" + "="*95)
-    print("  6-CHANNEL LCC MODEL PERFORMANCE EVALUATION (MAMMALIA VOLES)")
+    print("  6-CHANNEL LCC MODEL PERFORMANCE EVALUATION (DOLPHINS - LOCAL NORM)")
     print("="*95)
     print(f"LCC Nodes: {n} | LCC Edges: {G.number_of_edges()}")
     print("-"*95)
@@ -390,14 +390,15 @@ def main():
     ranking_pred = np.argsort(pred)[::-1]
     ranking_true = np.argsort(labels)[::-1]
 
-    top_pred_nodes = [int(nodelist[idx]) for idx in ranking_pred[:15]]
-    top_true_nodes = [int(nodelist[idx]) for idx in ranking_true[:15]]
+    top_k = min(15, n)
+    top_pred_nodes = [int(nodelist[idx]) for idx in ranking_pred[:top_k]]
+    top_true_nodes = [int(nodelist[idx]) for idx in ranking_true[:top_k]]
 
-    print(f"\nTop-15 Predicted key nodes: {top_pred_nodes}")
-    print(f"Top-15 Ground Truth (SIR) nodes: {top_true_nodes}")
+    print(f"\nTop-{top_k} Predicted key nodes: {top_pred_nodes}")
+    print(f"Top-{top_k} Ground Truth (SIR) nodes: {top_true_nodes}")
 
     overlap = set(top_pred_nodes).intersection(set(top_true_nodes))
-    print(f"Number of overlapping top key nodes: {len(overlap)} / 15")
+    print(f"Number of overlapping top key nodes: {len(overlap)} / {top_k}")
 
 if __name__ == "__main__":
     main()

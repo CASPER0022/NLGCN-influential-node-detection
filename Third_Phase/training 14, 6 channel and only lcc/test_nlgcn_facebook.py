@@ -163,7 +163,13 @@ def main():
         X_test = np.load(cache_x_path)
         labels = np.load(cache_y_path)
     else:
-        print("Precalculated cache not found. Performing calculations...")
+        print("Precalculated cache not fully found. Performing calculations...")
+        # Load precalculated labels if they exist to skip SIR simulation
+        labels = None
+        if os.path.exists(cache_y_path):
+            print("Found cached SIR simulation labels. Skipping simulation...")
+            labels = np.load(cache_y_path)
+
         # 1. Compute Distance Matrix (LCC only)
         print("Calculating shortest path lengths within LCC...")
         dist = dict(nx.all_pairs_shortest_path_length(G))
@@ -203,8 +209,13 @@ def main():
         W_NGI2 = W_NGI1 + A.dot(W_NGI1)
         W_NGI3 = W_NGI2 + A.dot(W_NGI2)
 
-        NLI_dict = {node: NLI[i] for i, node in enumerate(nodelist)}
-        NGI_dict = {node: NGI[i] for i, node in enumerate(nodelist)}
+        NLI_dict = {node: np.log10(NLI[i] + 1) for i, node in enumerate(nodelist)}
+        W_NLI2_dict = {node: np.log10(W_NLI2[i] + 1) for i, node in enumerate(nodelist)}
+        W_NLI3_dict = {node: np.log10(W_NLI3[i] + 1) for i, node in enumerate(nodelist)}
+
+        NGI_dict = {node: np.log10(NGI[i] + 1) for i, node in enumerate(nodelist)}
+        W_NGI2_dict = {node: np.log10(W_NGI2[i] + 1) for i, node in enumerate(nodelist)}
+        W_NGI3_dict = {node: np.log10(W_NGI3[i] + 1) for i, node in enumerate(nodelist)}
 
         # 5. Extract neighborhood matrices (6 channels)
         print("Generating neighborhood channels...")
@@ -227,11 +238,11 @@ def main():
                         mat[i, j] = 1
 
             f1 = {n: NLI_dict.get(n, 0) for n in nodes}
-            f2 = {n: W_NLI2[node_index[n]] if n is not None else 0 for n in nodes}
-            f3 = {n: W_NLI3[node_index[n]] if n is not None else 0 for n in nodes}
+            f2 = {n: W_NLI2_dict.get(n, 0) for n in nodes}
+            f3 = {n: W_NLI3_dict.get(n, 0) for n in nodes}
             f4 = {n: NGI_dict.get(n, 0) for n in nodes}
-            f5 = {n: W_NGI2[node_index[n]] if n is not None else 0 for n in nodes}
-            f6 = {n: W_NGI3[node_index[n]] if n is not None else 0 for n in nodes}
+            f5 = {n: W_NGI2_dict.get(n, 0) for n in nodes}
+            f6 = {n: W_NGI3_dict.get(n, 0) for n in nodes}
 
             c1 = embed_channel(mat, nodes, f1)
             c2 = embed_channel(mat, nodes, f2)
@@ -245,23 +256,24 @@ def main():
 
         X_test = np.array(channels)
 
-        # 6. Run parallel SIR simulations for ground truth evaluation
-        print("Running parallel SIR simulations for ground truth spreading capacity (SIR)...")
-        k_avg = np.mean(deg)
-        k2_avg = np.mean(deg**2)
-        beta_c = k_avg / (k2_avg - k_avg) if (k2_avg - k_avg) != 0 else 0.1
-        beta = 1.5 * beta_c
-        mu = 1.0
+        # 6. Run parallel SIR simulations only if labels were not loaded
+        if labels is None:
+            print("Running parallel SIR simulations for ground truth spreading capacity (SIR)...")
+            k_avg = np.mean(deg)
+            k2_avg = np.mean(deg**2)
+            beta_c = k_avg / (k2_avg - k_avg) if (k2_avg - k_avg) != 0 else 0.1
+            beta = 1.5 * beta_c
+            mu = 1.0
 
-        results = Parallel(n_jobs=-1)(
-            delayed(single_node_sir)(G, node, beta, mu, runs=500) 
-            for node in nodelist
-        )
-        labels = np.array(results)
-        
-        # Save to cache
+            results = Parallel(n_jobs=-1)(
+                delayed(single_node_sir)(G, node, beta, mu, runs=500) 
+                for node in nodelist
+            )
+            labels = np.array(results)
+            np.save(cache_y_path, labels)
+
+        # Save X_test to cache
         np.save(cache_x_path, X_test)
-        np.save(cache_y_path, labels)
         print(f"Calculated results saved to cache inside {results_dir}")
 
     # Normalize input features per channel using global training statistics
@@ -309,53 +321,70 @@ def main():
         eig_cent_vals = np.zeros_like(labels)
         has_eig = False
 
-    # Filter to top 20% nodes by ground truth SIR value
-    k_20 = max(1, int(0.20 * n))
-    top_20_indices = np.argsort(labels)[::-1][:k_20]
-    
-    pred_top = pred[top_20_indices]
-    labels_top = labels[top_20_indices]
-    deg_cent_vals_top = deg_cent_vals[top_20_indices]
-    clos_cent_val_top = clos_cent_val[top_20_indices]
-    bet_cent_vals_top = bet_cent_vals[top_20_indices]
-    pr_cent_vals_top = pr_cent_vals[top_20_indices]
-    core_cent_vals_top = core_cent_vals[top_20_indices]
-    eig_cent_vals_top = eig_cent_vals[top_20_indices]
+    # Helper to compute Kendall's Tau for a given fraction
+    def get_correlations(pct):
+        if pct == 100:
+            k = n
+            indices = np.arange(n)
+        else:
+            k = max(1, int(pct / 100.0 * n))
+            indices = np.argsort(labels)[::-1][:k]
 
-    # Compute Kendall Tau correlations (Top 20% only)
-    tau_pred_sir, _ = kendalltau(pred_top, labels_top)
-    tau_deg_sir, _ = kendalltau(deg_cent_vals_top, labels_top)
-    tau_clos_sir, _ = kendalltau(clos_cent_val_top, labels_top)
-    tau_bet_sir, _ = kendalltau(bet_cent_vals_top, labels_top)
-    tau_pr_sir, _ = kendalltau(pr_cent_vals_top, labels_top)
-    tau_core_sir, _ = kendalltau(core_cent_vals_top, labels_top)
-    if has_eig:
-        tau_eig_sir, _ = kendalltau(eig_cent_vals_top, labels_top)
-        eig_sir_str = f"{tau_eig_sir:.4f}"
-    else:
-        eig_sir_str = "Failed to converge"
+        p = pred[indices]
+        l = labels[indices]
+        d = deg_cent_vals[indices]
+        c = clos_cent_val[indices]
+        b = bet_cent_vals[indices]
+        pr = pr_cent_vals[indices]
+        cor = core_cent_vals[indices]
+        e = eig_cent_vals[indices]
+
+        tau_pred, _ = kendalltau(p, l)
+        tau_deg, _ = kendalltau(d, l)
+        tau_clos, _ = kendalltau(c, l)
+        tau_bet, _ = kendalltau(b, l)
+        tau_pr, _ = kendalltau(pr, l)
+        tau_core, _ = kendalltau(cor, l)
+        tau_eig, _ = kendalltau(e, l) if has_eig else (np.nan, None)
+
+        return {
+            "k": k,
+            "GNN": tau_pred,
+            "Degree": tau_deg,
+            "Closeness": tau_clos,
+            "Betweenness": tau_bet,
+            "PageRank": tau_pr,
+            "Coreness": tau_core,
+            "Eigenvector": tau_eig
+        }
+
+    res10 = get_correlations(10)
+    res20 = get_correlations(20)
+    res100 = get_correlations(100)
+
+    # Format eigenvector display
+    def fmt_val(val):
+        return f"{val:.4f}" if not np.isnan(val) else "Failed"
 
     # Display results
-    print("\n" + "="*70)
-    print("  6-CHANNEL LCC MODEL PERFORMANCE EVALUATION (FACEBOOK - TOP 20%)")
-    print("="*70)
-    print(f"LCC Nodes: {n} (Top 20% evaluated: {k_20}) | LCC Edges: {G.number_of_edges()}")
-    print("-"*70)
-    print(f"Model (NLGCN GNN) vs SIR ground truth Kendall Tau (Top 20%): {tau_pred_sir:.4f}")
-    print("-"*70)
+    print("\n" + "="*95)
+    print("  6-CHANNEL LCC MODEL PERFORMANCE EVALUATION (FACEBOOK)")
+    print("="*95)
+    print(f"LCC Nodes: {n} | LCC Edges: {G.number_of_edges()}")
+    print("-"*95)
     
-    print("\nTable 1: Correlation of NLGCN Predictions & Centrality Measures with SIR (Top 20%)")
-    print("-"*70)
-    print(f"{'Method / Centrality Measure':<30} | {'Kendall Tau with SIR (Top 20%)':<30}")
-    print("-"*70)
-    print(f"{'Ours (6-ch LCC NLGCN GNN)':<30} | {tau_pred_sir:<30.4f}")
-    print(f"{'Degree Centrality':<30} | {tau_deg_sir:<30.4f}")
-    print(f"{'Closeness Centrality':<30} | {tau_clos_sir:<30.4f}")
-    print(f"{'Betweenness Centrality':<30} | {tau_bet_sir:<30.4f}")
-    print(f"{'PageRank':<30} | {tau_pr_sir:<30.4f}")
-    print(f"{'Coreness (K-core)':<30} | {tau_core_sir:<30.4f}")
-    print(f"{'Eigenvector Centrality':<30} | {eig_sir_str:<30}")
-    print("-"*70)
+    print("\nTable 1: Kendall Tau Correlation of Predictions & Centrality Measures with SIR")
+    print("-"*95)
+    print(f"{'Method / Centrality Measure':<30} | {'Top 10% (k=' + str(res10['k']) + ')':<20} | {'Top 20% (k=' + str(res20['k']) + ')':<20} | {'Top 100% (All)':<15}")
+    print("-"*95)
+    print(f"{'Ours (6-ch LCC NLGCN GNN)':<30} | {res10['GNN']:<20.4f} | {res20['GNN']:<20.4f} | {res100['GNN']:<15.4f}")
+    print(f"{'Degree Centrality':<30} | {res10['Degree']:<20.4f} | {res20['Degree']:<20.4f} | {res100['Degree']:<15.4f}")
+    print(f"{'Closeness Centrality':<30} | {res10['Closeness']:<20.4f} | {res20['Closeness']:<20.4f} | {res100['Closeness']:<15.4f}")
+    print(f"{'Betweenness Centrality':<30} | {res10['Betweenness']:<20.4f} | {res20['Betweenness']:<20.4f} | {res100['Betweenness']:<15.4f}")
+    print(f"{'PageRank':<30} | {res10['PageRank']:<20.4f} | {res20['PageRank']:<20.4f} | {res100['PageRank']:<15.4f}")
+    print(f"{'Coreness (K-core)':<30} | {res10['Coreness']:<20.4f} | {res20['Coreness']:<20.4f} | {res100['Coreness']:<15.4f}")
+    print(f"{'Eigenvector Centrality':<30} | {fmt_val(res10['Eigenvector']):<20} | {fmt_val(res20['Eigenvector']):<20} | {fmt_val(res100['Eigenvector']):<15}")
+    print("-"*95)
 
     # Ranking evaluation (Top-15 predicted nodes vs Top-15 SIR nodes)
     ranking_pred = np.argsort(pred)[::-1]

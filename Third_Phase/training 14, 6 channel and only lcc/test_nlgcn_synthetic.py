@@ -16,7 +16,7 @@ torch.manual_seed(42)
 
 # Path resolution relative to script file
 script_dir = os.path.dirname(os.path.abspath(__file__))
-dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "mammalia-voles-bhp-trapping.edges"))
+dataset_path = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "Test", "synthetic_test_realworld.txt"))
 model_path = os.path.join(script_dir, "nlgcn_model.pth")
 results_dir = os.path.abspath(os.path.join(script_dir, "..", "results"))
 os.makedirs(results_dir, exist_ok=True)
@@ -68,7 +68,7 @@ def load_graph(path):
         edges = np.loadtxt(path, dtype=int, usecols=(0, 1))
     except Exception:
         edges_str = np.loadtxt(path, dtype=str, usecols=(0, 1))
-        cleaned = [[int(node.replace('V', '')) for node in row] for row in edges_str]
+        cleaned = [[int(node.replace('V', '').replace('v', '')) for node in row] for row in edges_str]
         edges = np.array(cleaned)
     
     if edges.ndim == 1:
@@ -349,14 +349,17 @@ def main():
 
         return {
             "k": k,
-            "GNN": tau_pred,
-            "Degree": tau_deg,
-            "Closeness": tau_clos,
-            "Betweenness": tau_bet,
-            "PageRank": tau_pr,
-            "Coreness": tau_core,
-            "Eigenvector": tau_eig
+            "GNN": pointer_or_nan(tau_pred),
+            "Degree": pointer_or_nan(tau_deg),
+            "Closeness": pointer_or_nan(tau_clos),
+            "Betweenness": pointer_or_nan(tau_bet),
+            "PageRank": pointer_or_nan(tau_pr),
+            "Coreness": pointer_or_nan(tau_core),
+            "Eigenvector": pointer_or_nan(tau_eig)
         }
+
+    def pointer_or_nan(v):
+        return v if v is not None else np.nan
 
     res10 = get_correlations(10)
     res20 = get_correlations(20)
@@ -368,7 +371,7 @@ def main():
 
     # Display results
     print("\n" + "="*95)
-    print("  6-CHANNEL LCC MODEL PERFORMANCE EVALUATION (MAMMALIA VOLES)")
+    print("  6-CHANNEL LCC MODEL PERFORMANCE EVALUATION (SYNTHETIC REALWORLD SCALE-FREE)")
     print("="*95)
     print(f"LCC Nodes: {n} | LCC Edges: {G.number_of_edges()}")
     print("-"*95)
@@ -390,14 +393,15 @@ def main():
     ranking_pred = np.argsort(pred)[::-1]
     ranking_true = np.argsort(labels)[::-1]
 
-    top_pred_nodes = [int(nodelist[idx]) for idx in ranking_pred[:15]]
-    top_true_nodes = [int(nodelist[idx]) for idx in ranking_true[:15]]
+    top_k = min(15, n)
+    top_pred_nodes = [int(nodelist[idx]) for idx in ranking_pred[:top_k]]
+    top_true_nodes = [int(nodelist[idx]) for idx in ranking_true[:top_k]]
 
-    print(f"\nTop-15 Predicted key nodes: {top_pred_nodes}")
-    print(f"Top-15 Ground Truth (SIR) nodes: {top_true_nodes}")
+    print(f"\nTop-{top_k} Predicted key nodes: {top_pred_nodes}")
+    print(f"Top-{top_k} Ground Truth (SIR) nodes: {top_true_nodes}")
 
     overlap = set(top_pred_nodes).intersection(set(top_true_nodes))
-    print(f"Number of overlapping top key nodes: {len(overlap)} / 15")
+    print(f"Number of overlapping top key nodes: {len(overlap)} / {top_k}")
 
 if __name__ == "__main__":
     main()
