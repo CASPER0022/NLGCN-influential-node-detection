@@ -26,10 +26,10 @@ os.makedirs(results_dir, exist_ok=True)
 target_datasets = {
     "facebook_combined.txt": "positive",
     "Budapest.txt": "adversarial",
-    "US_airports.txt": "adversarial",
-    "netscience.mtx": "adversarial",
+    "US_airports.txt": "positive",
+    "netscience.mtx": "positive",
     "Human12a.edge": "adversarial",
-    "C_elegans.txt": "adversarial",
+    "C_elegans.txt": "positive",
     "E.coli.edge": "adversarial",
     "cargoshipsBB.txt": "adversarial",
     "NewSpain_18c_travelmap.txt": "adversarial",
@@ -111,10 +111,7 @@ def load_graph_weighted(path, semantics):
                 effective_w = 1.0 / w if semantics == "adversarial" else w
                 
                 if G.has_edge(u, v):
-                    if semantics == "adversarial":
-                        G[u][v]['weight'] = min(G[u][v]['weight'], effective_w)
-                    else:
-                        G[u][v]['weight'] = max(G[u][v]['weight'], effective_w)
+                    G[u][v]['weight'] = max(G[u][v]['weight'], effective_w)
                 else:
                     G.add_edge(u, v, weight=effective_w)
         else:
@@ -146,10 +143,7 @@ def load_graph_weighted(path, semantics):
                         effective_w = 1.0 / w if semantics == "adversarial" else w
                         
                         if G.has_edge(u, v):
-                            if semantics == "adversarial":
-                                G[u][v]['weight'] = min(G[u][v]['weight'], effective_w)
-                            else:
-                                G[u][v]['weight'] = max(G[u][v]['weight'], effective_w)
+                            G[u][v]['weight'] = max(G[u][v]['weight'], effective_w)
                         else:
                             G.add_edge(u, v, weight=effective_w)
         except Exception as e:
@@ -407,7 +401,7 @@ def main():
         filename = os.path.basename(filepath)
         
         # Determine semantics and train/test status
-        semantics = target_datasets.get(filename, "adversarial") # default to adversarial for synthetic
+        semantics = target_datasets.get(filename, "positive") # default to positive for synthetic
         status = "train" if filename in TRAIN_DATASETS else "test"
         
         print(f"\n[{idx+1}/{len(all_files)}] Evaluating {filename} (Status: {status.upper()}, Semantics: {semantics})...")

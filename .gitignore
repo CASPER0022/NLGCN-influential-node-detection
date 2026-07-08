@@ -21,3 +21,5 @@ __pycache__/
 
 # Model results and caches
 Third_Phase/results/
+Third_Phase/*/results/
+*.npy
