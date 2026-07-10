@@ -10,6 +10,8 @@ import torch.nn.functional as F
 from torch.utils.data import TensorDataset, DataLoader
 from joblib import Parallel, delayed
 from scipy.sparse.linalg import eigsh
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="numpy")
 
 # Set seeds for reproducibility
 random.seed(42)
@@ -45,22 +47,24 @@ target_datasets = {
     "karate.txt": "positive"
 }
 
-# Training networks: ONLY using real-world weighted graphs
+# Training networks: 10 real-world weighted networks + 6 BBV synthetic training networks
 training_datasets = [
     "Budapest.txt",
-    "US_airports.txt",
+    # "US_airports.txt",
     "netscience.mtx",
-    "Human12a.edge",
     "C_elegans.txt",
     "E.coli.edge",
-    "cargoshipsBB.txt",
-    "NewSpain_18c_travelmap.txt",
     "carrib.txt",
     "cypedge.txt",
     "open_flights.txt",
     "out.advogato",
-    "out.foldoc",
-    "mammalia-voles-bhp-trapping.edges"
+    # "out.foldoc",
+    "synthetic_sf_weighted_train_100.txt",
+    "synthetic_sf_weighted_train_250.txt",
+    "synthetic_sf_weighted_train_500.txt",
+    "synthetic_sf_weighted_train_1000.txt",
+    "synthetic_sf_weighted_train_2500.txt",
+    "synthetic_sf_weighted_train_5000.txt"
 ]
 
 # ---- WNLGCN Model Definition (6 Channels, weighted variant) ----
@@ -89,6 +93,7 @@ class WNLGCN(nn.Module):
         self.bn = nn.BatchNorm2d(16)
         self.pool = nn.MaxPool2d(2)
         self.fc1 = nn.Linear(16 * 20 * 20, 8)
+        self.dropout = nn.Dropout(p=0.5)
         self.fc2 = nn.Linear(8, 1)
 
     def forward(self, x):
@@ -98,7 +103,9 @@ class WNLGCN(nn.Module):
         x = F.relu(x)
         x = self.pool(x)
         x = x.view(x.size(0), -1)
+        x = self.dropout(x)
         x = F.relu(self.fc1(x))
+        x = self.dropout(x)
         x = self.fc2(x)
         return x
 
@@ -190,43 +197,26 @@ def embed_channel(mat_binary, mat_weighted, nodes, feature_dict, use_weighted_of
                 out[i, j] = mat_weighted[i, j] if use_weighted_offdiag else mat_binary[i, j]
     return out
 
-# ---- Weighted SIR Simulation ----
-def SIR_simulation_weighted(G, seed, beta, mu, steps=1000):
-    susceptible = set(G.nodes())
-    infected = {seed}
-    recovered = set()
-    susceptible.remove(seed)
-
-    for _ in range(steps):
-        new_infected = set()
-        new_recovered = set()
-
-        for node in infected:
-            for nbr in G.neighbors(node):
-                if nbr in susceptible:
-                    w = G[node][nbr].get('weight', 1.0)
-                    p = 1.0 - (1.0 - beta) ** w
-                    if random.random() < p:
-                        new_infected.add(nbr)
-
-            if random.random() < mu:
-                new_recovered.add(node)
-
-        infected |= new_infected
-        infected -= new_recovered
-        recovered |= new_recovered
-        susceptible -= new_infected
-
-        if len(infected) == 0:
-            break
-
-    return len(recovered)
-
-def single_node_sir_weighted(G, seed, beta, mu, runs=500):
-    spread = 0
-    for _ in range(runs):
-        spread += SIR_simulation_weighted(G, seed, beta, mu)
-    return spread / runs
+# ---- Optimized Chunked Weighted SIR Simulation ----
+def worker_sir_weighted(adj_dict, nodes_subset, runs=500):
+    results = []
+    for seed in nodes_subset:
+        spread = 0
+        for _ in range(runs):
+            visited = {seed}
+            active = [seed]
+            while active:
+                next_active = []
+                for node in active:
+                    for nbr, p in adj_dict[node]:
+                        if nbr not in visited:
+                            if random.random() < p:
+                                visited.add(nbr)
+                                next_active.append(nbr)
+                active = next_active
+            spread += len(visited)
+        results.append(spread / runs)
+    return results
 
 # ---- Process a Single Weighted Graph Dataset (Filtering to LCC only) ----
 def process_dataset(filepath, filename, semantics, L=40, precalculated_y=None):
@@ -263,36 +253,32 @@ def process_dataset(filepath, filename, semantics, L=40, precalculated_y=None):
         G_dist.add_edge(u, v, distance=1.0 / d['weight_norm'])
 
     dist = dict(nx.all_pairs_dijkstra_path_length(G_dist, weight='distance'))
-    dist_matrix = np.zeros((n, n))
-    for i, u in enumerate(nodelist):
-        for j, v in enumerate(nodelist):
-            if i != j and v in dist[u]:
-                dist_matrix[i, j] = dist[u][v]
-
-    # Topological hop matrix
-    hop_dist = dict(nx.all_pairs_shortest_path_length(G))
-    hop_matrix = np.zeros((n, n))
-    for i, u in enumerate(nodelist):
-        for j, v in enumerate(nodelist):
-            if i != j and v in hop_dist[u]:
-                hop_matrix[i, j] = hop_dist[u][v]
 
     # Global Influence (NGI)
     print("  -> Computing Weighted Global Influence (W-NGI)...")
     alpha = 0.5
     NGI = np.zeros(n)
-    for i in range(n):
-        dists = dist_matrix[i]
-        mask = (dists > 0)
-        if np.any(mask):
-            NGI[i] = np.sum(np.sqrt(strength[mask] + alpha) / dists[mask])
+    for i, u in enumerate(nodelist):
+        u_dists = dist.get(u, {})
+        dists_list = []
+        strengths_list = []
+        for j, v in enumerate(nodelist):
+            if u != v and v in u_dists:
+                dists_list.append(u_dists[v])
+                strengths_list.append(strength[j])
+        if dists_list:
+            NGI[i] = np.sum(np.sqrt(np.array(strengths_list) + alpha) / np.array(dists_list))
+
+    # Topological hop matrix
+    hop_dist = dict(nx.all_pairs_shortest_path_length(G))
 
     # Local Influence (NLI)
     print("  -> Computing Weighted Local Influence (W-NLI)...")
     K_hop = 3
     NLI = np.zeros(n)
-    for i in range(n):
-        hop_count = np.sum((hop_matrix[i] >= 1) & (hop_matrix[i] <= K_hop))
+    for i, u in enumerate(nodelist):
+        u_hop_dists = hop_dist.get(u, {})
+        hop_count = sum(1 for v in nodelist if u != v and v in u_hop_dists and 1 <= u_hop_dists[v] <= K_hop)
         if hop_count > 0:
             NLI[i] = (strength[i] * np.log10(hop_count)) / n
 
@@ -334,13 +320,24 @@ def process_dataset(filepath, filename, semantics, L=40, precalculated_y=None):
         beta_c = 1.0 / lambda_max if lambda_max > 0 else 0.1
         beta = 1.5 * beta_c
         beta = min(beta, 0.9)
-        mu = 1.0
 
-        results = Parallel(n_jobs=-1)(
-            delayed(single_node_sir_weighted)(G, node, beta, mu, runs=500)
-            for node in nodelist
+        # Precompute transmission probabilities for each edge to avoid NetworkX and math overhead in parallel workers
+        adj_dict = {}
+        for u in G.nodes():
+            adj_dict[u] = []
+            for v in G.neighbors(u):
+                w = G[u][v].get('weight', 1.0)
+                p = 1.0 - (1.0 - beta) ** w
+                adj_dict[u].append((v, p))
+
+        num_cores = os.cpu_count() or 4
+        chunks = np.array_split(nodelist, num_cores)
+
+        results_chunks = Parallel(n_jobs=num_cores)(
+            delayed(worker_sir_weighted)(adj_dict, chunk, runs=500)
+            for chunk in chunks
         )
-        labels = np.array(results)
+        labels = np.array([val for chunk in results_chunks for val in chunk])
 
         if np.max(labels) > 0:
             labels = labels / np.max(labels)
@@ -400,6 +397,27 @@ def find_dataset_file(root_dir, filename):
             return os.path.join(dirpath, filename)
     return None
 
+# ---- Pairwise Margin Ranking Loss (within-batch, i.e. within-graph) ----
+def pairwise_ranking_loss(pred, y, margin=0.3):
+    """
+    Penalizes any pair (i, j) in the batch whose predicted order disagrees
+    with the ground-truth order, by at least `margin`.
+    Only meaningful within a single graph's nodes.
+    """
+    pred = pred.view(-1)
+    y = y.view(-1)
+
+    diff_pred = pred.unsqueeze(1) - pred.unsqueeze(0)   # (B, B)
+    diff_y = y.unsqueeze(1) - y.unsqueeze(0)             # (B, B)
+    sign_y = torch.sign(diff_y)
+
+    mask = diff_y.abs() > 1e-6   # ignore (near-)tied ground-truth pairs
+    if mask.sum() == 0:
+        return torch.tensor(0.0, device=pred.device)
+
+    losses = F.relu(margin - sign_y * diff_pred)
+    return losses[mask].mean()
+
 # ---- Main Execution Pipeline ----
 def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -445,53 +463,80 @@ def main():
         print("No datasets were successfully processed. Exiting.")
         sys.exit(1)
 
-    X_train = np.concatenate(all_X, axis=0)
-    y_train = np.concatenate(all_y, axis=0)
-
-    y_train = y_train.reshape(-1, 1)
-    y_mean = y_train.mean()
-    y_std = y_train.std()
-    y_train = (y_train - y_mean) / (y_std + 1e-6)
+    # Compute global training statistics for standardizing target labels
+    y_all_concat = np.concatenate(all_y, axis=0)
+    y_mean = y_all_concat.mean()
+    y_std = y_all_concat.std()
 
     # Save training stat files
     np.save(os.path.join(script_dir, "y_mean_weighted.npy"), y_mean)
     np.save(os.path.join(script_dir, "y_std_weighted.npy"), y_std)
 
-    X_tensor = torch.tensor(X_train, dtype=torch.float32)
-    y_tensor = torch.tensor(y_train, dtype=torch.float32)
-
-    dataset = TensorDataset(X_tensor, y_tensor)
-    loader = DataLoader(dataset, batch_size=256, shuffle=True)
+    # ---- Build one dataset (and one DataLoader) PER graph, so that ----
+    # ---- pairwise ranking comparisons never cross graph boundaries. ----
+    per_graph_loaders = []
+    for X_i, y_i in zip(all_X, all_y):
+        y_i_norm = (y_i.reshape(-1, 1) - y_mean) / (y_std + 1e-6)
+        X_t = torch.tensor(X_i, dtype=torch.float32)
+        y_t = torch.tensor(y_i_norm, dtype=torch.float32)
+        ds = TensorDataset(X_t, y_t)
+        bs = min(256, len(ds))
+        per_graph_loaders.append(DataLoader(ds, batch_size=bs, shuffle=True))
 
     print(f"\nCompleted data preparation in {time.time() - start_time:.2f}s")
-    print(f"Total training samples: {X_tensor.shape[0]}")
+    print(f"Total training samples: {sum(len(l.dataset) for l in per_graph_loaders)}")
+    print(f"Training over {len(per_graph_loaders)} graphs (grouped batching)")
 
     model = WNLGCN().to(device)
-    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
-    criterion = nn.MSELoss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=1e-3)
+    mse_criterion = nn.MSELoss()
+
+    # Hybrid loss weight: how much to weight ranking vs. MSE
+    ALPHA_RANK = 1.0
+    MARGIN = 0.3
 
     epochs = 300
-    print("\nStarting Weighted GNN training loop...")
+    print("\nStarting Weighted GNN training loop (Hybrid MSE + Ranking Loss)...")
 
     for epoch in range(1, epochs + 1):
         model.train()
         epoch_loss = 0.0
+        epoch_mse = 0.0
+        epoch_rank = 0.0
+        n_batches = 0
 
-        for batch_X, batch_y in loader:
-            batch_X, batch_y = batch_X.to(device), batch_y.to(device)
-            optimizer.zero_grad()
-            outputs = model(batch_X)
-            loss = criterion(outputs, batch_y)
-            loss.backward()
-            optimizer.step()
-            epoch_loss += loss.item() * batch_X.size(0)
+        # Shuffle graph order each epoch so the model doesn't see a fixed sequence
+        loader_order = list(range(len(per_graph_loaders)))
+        random.shuffle(loader_order)
 
-        epoch_loss /= len(loader.dataset)
+        for gidx in loader_order:
+            for batch_X, batch_y in per_graph_loaders[gidx]:
+                batch_X, batch_y = batch_X.to(device), batch_y.to(device)
+                optimizer.zero_grad()
+
+                outputs = model(batch_X)
+                mse_loss = mse_criterion(outputs, batch_y)
+                rank_loss = pairwise_ranking_loss(outputs, batch_y, margin=MARGIN)
+                loss = mse_loss + ALPHA_RANK * rank_loss
+
+                loss.backward()
+                optimizer.step()
+
+                epoch_loss += loss.item() * batch_X.size(0)
+                epoch_mse += mse_loss.item() * batch_X.size(0)
+                epoch_rank += rank_loss.item() * batch_X.size(0)
+                n_batches += batch_X.size(0)
+
+        epoch_loss /= n_batches
+        epoch_mse /= n_batches
+        epoch_rank /= n_batches
 
         if epoch % 20 == 0 or epoch == 1:
             elapsed = time.time() - start_time
             eta = (elapsed / epoch) * (epochs - epoch) if epoch > 0 else 0
-            print(f"Epoch {epoch}/{epochs} | Loss: {epoch_loss:.6f} | Elapsed: {elapsed:.1f}s | ETA: {eta:.1f}s")
+            print(f"Epoch {epoch}/{epochs} | Total: {epoch_loss:.6f} | "
+                  f"MSE: {epoch_mse:.6f} | Rank: {epoch_rank:.6f} | "
+                  f"Elapsed: {elapsed:.1f}s | ETA: {eta:.1f}s")
 
     model_save_path = os.path.join(script_dir, "wnlgcn_model.pth")
     torch.save(model.state_dict(), model_save_path)

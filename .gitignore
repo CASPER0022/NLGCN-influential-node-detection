@@ -23,3 +23,6 @@ __pycache__/
 Third_Phase/results/
 Third_Phase/*/results/
 *.npy
+*.pth
+Datasets/
+
