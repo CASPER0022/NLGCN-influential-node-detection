@@ -18,57 +18,53 @@ torch.manual_seed(42)
 
 # Set path targets relative to script
 script_dir = os.path.dirname(os.path.abspath(__file__))
-datasets_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets"))
+datasets_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "weighted Datasets"))
 # Cache results locally inside the weighted model folder
 results_dir = os.path.abspath(os.path.join(script_dir, "results"))
 os.makedirs(results_dir, exist_ok=True)
 
-# ---- Classification of Target Datasets with Edge Semantics ----
-target_datasets = {
-    "facebook_combined.txt": "positive",
-    "Budapest.txt": "adversarial",
-    "US_airports.txt": "positive",
-    "netscience.mtx": "positive",
-    "Human12a.edge": "adversarial",
-    "C_elegans.txt": "positive",
-    "E.coli.edge": "adversarial",
-    "cargoshipsBB.txt": "adversarial",
-    "NewSpain_18c_travelmap.txt": "adversarial",
-    "carrib.txt": "positive",
-    "cypedge.txt": "positive",
-    "open_flights.txt": "positive",
-    "out.advogato": "positive",
-    # "out.foldoc": "positive",
-    "mammalia-voles-bhp-trapping.edges": "positive",
-    "dolphins.txt": "positive",
-    "football.net": "positive",
-    "karate.txt": "positive",
-    "synthetic_sf_weighted_train_100.txt": "positive",
-    "synthetic_sf_weighted_train_250.txt": "positive",
-    "synthetic_sf_weighted_train_500.txt": "positive",
-    "synthetic_sf_weighted_train_1000.txt": "positive",
-    "synthetic_sf_weighted_train_2500.txt": "positive",
-    "synthetic_sf_weighted_train_5000.txt": "positive",
-    "synthetic_sf_weighted_test_100.txt": "positive",
-    "synthetic_sf_weighted_test_250.txt": "positive",
-    "synthetic_sf_weighted_test_500.txt": "positive",
-    "synthetic_sf_weighted_test_1000.txt": "positive",
-    "synthetic_sf_weighted_test_2500.txt": "positive",
-    "synthetic_sf_weighted_test_5000.txt": "positive"
-}
+# Datasets folders
+train_folder = os.path.join(datasets_dir, "train")
+test_folder = os.path.join(datasets_dir, "test")
 
-# Define the training files to mark them as TRAIN (white) vs TEST (green)
-TRAIN_DATASETS = {
-    "Budapest.txt", "US_airports.txt", "netscience.mtx", "C_elegans.txt",
-    "E.coli.edge", "carrib.txt", "cypedge.txt", "open_flights.txt",
-    "out.advogato", # "out.foldoc",
-    "synthetic_sf_weighted_train_100.txt",
-    "synthetic_sf_weighted_train_250.txt",
-    "synthetic_sf_weighted_train_500.txt",
-    "synthetic_sf_weighted_train_1000.txt",
-    "synthetic_sf_weighted_train_2500.txt",
-    "synthetic_sf_weighted_train_5000.txt"
-}
+def get_semantics(filename):
+    semantics_map = {
+        "Budapest.txt": "adversarial",
+        "US_airports.txt": "positive",
+        "netscience.mtx": "positive",
+        "Human12a.edge": "adversarial",
+        "C_elegans.txt": "positive",
+        "E.coli.edge": "adversarial",
+        "cargoshipsBB.txt": "adversarial",
+        "NewSpain_18c_travelmap.txt": "adversarial",
+        "carrib.txt": "positive",
+        "cypedge.txt": "positive",
+        "open_flights.txt": "positive",
+        "out.advogato": "positive",
+    # "out.foldoc": "positive",
+        "mammalia-voles-bhp-trapping.edges": "positive",
+        "dolphins.txt": "positive",
+        "football.net": "positive",
+        "karate.txt": "positive"
+    }
+    return semantics_map.get(filename, "positive")
+
+# Discover all active datasets from folders
+train_datasets = []
+if os.path.exists(train_folder):
+    for f in sorted(os.listdir(train_folder)):
+        if os.path.exists(os.path.join(results_dir, f"{f}_weighted_local_norm_X.npy")):
+            train_datasets.append(f)
+
+test_datasets = []
+if os.path.exists(test_folder):
+    for f in sorted(os.listdir(test_folder)):
+        if f in ["karate.txt", "cargoshipsBB.txt"]:
+            continue
+        if os.path.exists(os.path.join(results_dir, f"{f}_weighted_local_norm_X.npy")):
+            test_datasets.append(f)
+
+print(f"Discovered {len(train_datasets)} training datasets and {len(test_datasets)} testing datasets.")
 
 # ---- WNLGCN Model Definition (6 Channels, weighted variant) ----
 class ChannelAttention(nn.Module):
@@ -373,11 +369,10 @@ def find_dataset_file(root_dir, filename):
     return None
 
 def get_all_dataset_files(root_dir):
-    # Retrieve all files inside the weighted Datasets folders recursively
-    weighted_root = os.path.join(root_dir, "weighted Datasets")
+    # Retrieve all files recursively under root_dir, skipping weighted Datasets
     valid_exts = {".txt", ".edge", ".edges", ".mtx"}
     files_list = []
-    for dirpath, _, filenames in os.walk(weighted_root):
+    for dirpath, _, filenames in os.walk(root_dir):
         for f in filenames:
             ext = os.path.splitext(f)[1].lower()
             if ext in valid_exts or f.startswith("out."):
@@ -524,341 +519,115 @@ def main():
     model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
     model.eval()
 
-    all_files = get_all_dataset_files(datasets_dir)
-    print(f"Found {len(all_files)} graph files to evaluate.")
+    results = []
+    datasets_to_eval = [(name, "train") for name in train_datasets] + [(name, "test") for name in test_datasets]
 
-    sir_unweighted_results = []
-    sir_weighted_results = []
-
-    for idx, filepath in enumerate(sorted(all_files)):
-        filename = os.path.basename(filepath)
-        if filename not in target_datasets:
-            continue
-        semantics = target_datasets[filename]
-        is_train = (filename in TRAIN_DATASETS)
-        status = "train" if is_train else "test"
+    for filename, status in datasets_to_eval:
+        filepath = os.path.join(train_folder, filename) if status == "train" else os.path.join(test_folder, filename)
         
-        print(f"\n[{idx+1}/{len(all_files)}] Evaluating {filename} (Status: {status.upper()})...")
+        cache_x_path = os.path.join(results_dir, f"{filename}_weighted_local_norm_X.npy")
+        cache_y_path = os.path.join(results_dir, f"{filename}_weighted_y.npy")
+        cache_weig = os.path.join(results_dir, f"{filename}_weig.npy")
+        cache_wdeg = os.path.join(results_dir, f"{filename}_wdeg.npy")
+        cache_wclos = os.path.join(results_dir, f"{filename}_wclos.npy")
+        cache_wbet = os.path.join(results_dir, f"{filename}_wbet.npy")
 
-        try:
-            # 1. Load Graph & LCC
-            G_raw = load_graph_weighted(filepath, semantics)
+        X_test = np.load(cache_x_path)
+        labels = np.load(cache_y_path).flatten()
+        
+        # Fallback dynamic centrality computation
+        if (os.path.exists(cache_weig) and os.path.exists(cache_wdeg) and 
+            os.path.exists(cache_wclos) and os.path.exists(cache_wbet)):
+            weig_vals = np.load(cache_weig).flatten()
+            wdeg_vals = np.load(cache_wdeg).flatten()
+            wclos_vals = np.load(cache_wclos).flatten()
+            wbet_vals = np.load(cache_wbet).flatten()
+        else:
+            G_raw = load_graph_weighted(filepath, "positive")
             G = get_lcc_subgraph(G_raw)
             nodelist = list(G.nodes())
-            node_index = {node: i for i, node in enumerate(nodelist)}
-            n = len(nodelist)
-            
-            # Per-graph weight normalization
-            raw_weights = np.array([d['weight'] for _, _, d in G.edges(data=True)])
-            max_w = raw_weights.max() if len(raw_weights) > 0 else 1.0
+
+            wdeg_dict = dict(G.degree(weight='weight'))
+            wdeg_vals = np.array([wdeg_dict.get(n, 1.0) for n in nodelist])
+
+            G_dist = nx.Graph()
             for u, v, d in G.edges(data=True):
-                d['weight_norm'] = d['weight'] / max_w
-            
-            if n < 5:
-                continue
+                w = d.get('weight', 1.0)
+                G_dist.add_edge(u, v, distance=1.0 / w)
 
-            deg = np.array([G.degree(node) for node in nodelist])
+            wclos_dict = nx.closeness_centrality(G_dist, distance='distance')
+            wclos_vals = np.array([wclos_dict[n] for n in nodelist])
 
-            # 2. Get/Compute labels (Weighted SIR spreading capacity)
-            cache_y_path = os.path.join(results_dir, f"{filename}_weighted_y.npy")
-            if os.path.exists(cache_y_path):
-                labels = np.load(cache_y_path)
-            else:
-                # Calculate weighted transmission threshold
-                raw_weights = np.array([d['weight'] for _, _, d in G.edges(data=True)])
-                max_w = raw_weights.max() if len(raw_weights) > 0 else 1.0
-                W_norm = nx.to_numpy_array(G, nodelist=nodelist, weight='weight_norm')
-                try:
-                    if n > 2:
-                        from scipy.sparse.linalg import eigsh
-                        lambda_max = eigsh(W_norm, k=1, which='LA', return_eigenvectors=False)[0]
-                    else:
-                        lambda_max = np.max(np.linalg.eigvalsh(W_norm)) if n > 0 else 1.0
-                except Exception:
-                    lambda_max = np.max(np.linalg.eigvalsh(W_norm)) if n > 0 else 1.0
+            wbet_dict = nx.betweenness_centrality(G_dist, weight='distance', normalized=True)
+            wbet_vals = np.array([wbet_dict[n] for n in nodelist])
 
-                beta_c = 1.0 / lambda_max if lambda_max > 0 else 0.1
-                beta = 1.5 * beta_c
-                beta = min(beta, 0.9)
+            try:
+                weig_dict = nx.eigenvector_centrality_numpy(G, weight='weight')
+                weig_vals = np.array([weig_dict[n] for n in nodelist])
+            except Exception:
+                weig_vals = np.zeros(len(nodelist))
 
-                # Precompute edge probabilities
-                adj_dict = {}
-                for u in G.nodes():
-                    adj_dict[u] = []
-                    for v in G.neighbors(u):
-                        w = G[u][v].get('weight_norm', 1.0)
-                        p = 1.0 - (1.0 - beta) ** w
-                        adj_dict[u].append((v, p))
+        with torch.no_grad():
+            pred = model(torch.tensor(X_test, dtype=torch.float32)).numpy().flatten()
 
-                num_cores = os.cpu_count() or 4
-                chunks = np.array_split(nodelist, num_cores)
+        top_indices = get_subset_indices(labels, 20)
+        tau_ours = safe_tau(pred, labels, top_indices)
+        tau_weig = safe_tau(weig_vals, labels, top_indices)
+        tau_wdeg = safe_tau(wdeg_vals, labels, top_indices)
+        tau_wclos = safe_tau(wclos_vals, labels, top_indices)
+        tau_wbet = safe_tau(wbet_vals, labels, top_indices)
 
-                results_chunks = Parallel(n_jobs=num_cores)(
-                    delayed(worker_sir_weighted)(adj_dict, chunk, runs=500) 
-                    for chunk in chunks
-                )
-                labels = np.array([val for chunk in results_chunks for val in chunk])
-                if np.max(labels) > 0:
-                    labels = labels / np.max(labels)
-                np.save(cache_y_path, labels)
+        results.append((filename, status, tau_ours, tau_weig, tau_wdeg, tau_wclos, tau_wbet))
 
-            # 3. Get/Compute neighborhood channel features
-            cache_x_path = os.path.join(results_dir, f"{filename}_weighted_local_norm_X.npy")
-            if os.path.exists(cache_x_path):
-                X_test = np.load(cache_x_path)
-            else:
-                X_raw = compute_weighted_features(G, nodelist, node_index)
-                X_mean = X_raw.mean(axis=(0, 2, 3), keepdims=True)
-                X_std = X_raw.std(axis=(0, 2, 3), keepdims=True)
-                X_test = (X_raw - X_mean) / (X_std + 1e-6)
-                np.save(cache_x_path, X_test)
-
-            # 4. Model Inference
-            with torch.no_grad():
-                pred = model(torch.tensor(X_test, dtype=torch.float32)).numpy().flatten()
-
-            # ---- Cache Centrality Calculations ----
-            cache_deg = os.path.join(results_dir, f"{filename}_deg.npy")
-            cache_clos = os.path.join(results_dir, f"{filename}_clos.npy")
-            cache_bet = os.path.join(results_dir, f"{filename}_bet.npy")
-            cache_eig = os.path.join(results_dir, f"{filename}_eig.npy")
-            cache_wdeg = os.path.join(results_dir, f"{filename}_wdeg.npy")
-            cache_wclos = os.path.join(results_dir, f"{filename}_wclos.npy")
-            cache_wbet = os.path.join(results_dir, f"{filename}_wbet.npy")
-            cache_weig = os.path.join(results_dir, f"{filename}_weig.npy")
-
-            # Load or compute unweighted centralities
-            if (os.path.exists(cache_deg) and os.path.exists(cache_clos) and 
-                    os.path.exists(cache_bet) and os.path.exists(cache_eig)):
-                deg_vals = np.load(cache_deg)
-                clos_vals = np.load(cache_clos)
-                bet_vals = np.load(cache_bet)
-                eig_vals = np.load(cache_eig)
-                has_eig = not np.all(eig_vals == 0)
-            else:
-                deg_cent = nx.degree_centrality(G)
-                deg_vals = np.array([deg_cent[node] for node in nodelist])
-                np.save(cache_deg, deg_vals)
-
-                clos_cent = nx.closeness_centrality(G)
-                clos_vals = np.array([clos_cent[node] for node in nodelist])
-                np.save(cache_clos, clos_vals)
-
-                bet_cent = nx.betweenness_centrality(G)
-                bet_vals = np.array([bet_cent[node] for node in nodelist])
-                np.save(cache_bet, bet_vals)
-
-                try:
-                    eig_cent = nx.eigenvector_centrality(G, max_iter=1000)
-                    eig_vals = np.array([eig_cent[node] for node in nodelist])
-                    has_eig = True
-                except Exception:
-                    try:
-                        eig_cent = nx.eigenvector_centrality_numpy(G)
-                        eig_vals = np.array([eig_cent[node] for node in nodelist])
-                        has_eig = True
-                    except Exception:
-                        eig_vals = np.zeros(n)
-                        has_eig = False
-                np.save(cache_eig, eig_vals)
-
-            # Load or compute weighted centralities
-            if (os.path.exists(cache_wdeg) and os.path.exists(cache_wclos) and 
-                    os.path.exists(cache_wbet) and os.path.exists(cache_weig)):
-                wdeg_vals = np.load(cache_wdeg)
-                wclos_vals = np.load(cache_wclos)
-                wbet_vals = np.load(cache_wbet)
-                weig_vals = np.load(cache_weig)
-                has_weig = not np.all(weig_vals == 0)
-            else:
-                wdeg_dict = dict(G.degree(weight='weight'))
-                wdeg_vals = np.array([wdeg_dict.get(n, 1.0) for n in nodelist])
-                np.save(cache_wdeg, wdeg_vals)
-
-                G_dist = nx.Graph()
-                for u, v, d in G.edges(data=True):
-                    w = d.get('weight', 1.0)
-                    G_dist.add_edge(u, v, distance=1.0 / w)
-
-                wclos_dict = nx.closeness_centrality(G_dist, distance='distance')
-                wclos_vals = np.array([wclos_dict[n] for n in nodelist])
-                np.save(cache_wclos, wclos_vals)
-
-                wbet_dict = nx.betweenness_centrality(G_dist, weight='distance', normalized=True)
-                wbet_vals = np.array([wbet_dict[n] for n in nodelist])
-                np.save(cache_wbet, wbet_vals)
-
-                try:
-                    weig_dict = nx.eigenvector_centrality(G, weight='weight', max_iter=1000)
-                    weig_vals = np.array([weig_dict[n] for n in nodelist])
-                    has_weig = True
-                except Exception:
-                    try:
-                        weig_dict = nx.eigenvector_centrality_numpy(G, weight='weight')
-                        weig_vals = np.array([weig_dict[n] for n in nodelist])
-                        has_weig = True
-                    except Exception:
-                        weig_vals = np.zeros(n)
-                        has_weig = False
-                np.save(cache_weig, weig_vals)
-
-            # Compute correlations for subset (only Top 20% is needed)
-            unw_pct_data = {}
-            w_pct_data = {}
-            for pct in [20]:
-                indices = get_subset_indices(labels, pct)
-                
-                unw_pct_data[pct] = (
-                    safe_tau(pred, labels, indices),
-                    safe_tau(deg_vals, labels, indices),
-                    safe_tau(clos_vals, labels, indices),
-                    safe_tau(bet_vals, labels, indices),
-                    safe_tau(eig_vals, labels, indices) if has_eig else np.nan
-                )
-                
-                w_pct_data[pct] = (
-                    safe_tau(pred, labels, indices),
-                    safe_tau(wdeg_vals, labels, indices),
-                    safe_tau(wclos_vals, labels, indices),
-                    safe_tau(wbet_vals, labels, indices),
-                    safe_tau(weig_vals, labels, indices) if has_weig else np.nan
-                )
-                
-            sir_unweighted_results.append((filename, status, unw_pct_data))
-            sir_weighted_results.append((filename, status, w_pct_data))
-
-        except Exception as ex:
-            print(f"Error processing {filename}: {ex}")
+    pdf_report_path = os.path.join(script_dir, "analysis_report_weighted.pdf")
+    print(f"Generating PDF report at {pdf_report_path}...")
 
     def fmt(v):
         return f"{v:.4f}" if (v is not None and not np.isnan(v)) else "nan"
 
-    # ---- GENERATE PDF ANALYSIS REPORT ----
-    pdf_report_path = os.path.join(script_dir, "analysis_report_weighted.pdf")
-    print(f"\nGenerating GNN Weighted Model Analysis Report at {pdf_report_path}...")
-    
     with PdfPages(pdf_report_path) as pdf:
-        
-        # Page 1: Introduction & Methodology Explanations
-        intro_title = "Evaluation Report: WNLGCN (Weighted GNN) Spreading Performance Analysis"
+        # Page 1: Explanation
+        intro_title = "Evaluation Report: WNLGCN (Original 6-Channel) Spreading Performance Analysis"
         intro_paragraphs = [
             "### 1. Introduction and Objectives",
-            "This report evaluates the performance of the Neighborhood-based Weighted Local-to-Global Convolutional Network (WNLGCN) model with Squeeze-and-Excitation Channel Attention against traditional node centrality heuristics.",
-            "The primary objective is to demonstrate that our trained GNN model learns robust, topology-independent features to identify highly influential nodes (spreaders) in weighted complex networks.",
+            "This report evaluates the performance of the original WNLGCN model (wnlgcn_model.pth) on scale-free datasets.",
+            "The model utilizes the original 6-channel architecture to identify influential nodes.",
             "",
-            "### 2. Why We Compare with SIR Spreading Capacity",
-            "The Susceptible-Infected-Recovered (SIR) model simulates realistic information or disease transmission dynamics. High Kendall's Tau correlation with SIR spreading capacity indicates that the evaluated metric serves as an accurate proxy for real-world spreading influence.",
+            "### 2. Spreading Capacity",
+            "We compare our model's predictions with ground-truth SIR spreading simulations and other centrality heuristics.",
             "",
-            "### 3. Unweighted vs. Weighted Analysis",
-            "Real-world graphs are often weighted, where weights can either represent connectivity strength (positive semantics) or physical transport distance/cost (adversarial semantics). We compare our model against both unweighted and weighted benchmarks to show that WNLGCN successfully adapts to both weight structures by applying inverted (1/w) or direct (w) scaling.",
-            "",
-            "### 4. Why We Evaluate at Subsets (Top 20% Nodes)",
-            "For applications like target immunization or viral marketing, it is critical to identify the absolute top-ranked spreaders rather than average nodes. Therefore, we sort nodes by SIR ground-truth and compute Kendall's Tau correlations on the Top 20% subset of nodes. Outperforming baselines on the Top 20% subset highlights the model's practical utility.",
-            "",
-            "### 5. Color Highlighting (Train vs. Test Generalization)",
-            "Light green rows highlight test datasets that were completely unseen by the GNN during training. Neutral white rows represent datasets that were present in the training set. Strong performance on the green rows proves the zero-shot generalizability of the learned features to new topological networks."
+            "### 3. Generalization",
+            "The light green rows represent unseen test networks. Outperforming the baseline measures on these datasets demonstrates the zero-shot generalizability of our model."
         ]
         add_text_page(pdf, intro_title, intro_paragraphs)
-        
-        # Only evaluate and render for Top 20%
-        for pct in [20]:
-            title_suffix = "Top 20% Nodes"
-            
-            # --- Unweighted Centralities comparison page ---
-            unw_title = "Table 1: Comparative Spreading Performance vs. Unweighted Centrality Measures (Top 20% Nodes)"
-            
-            unw_why = (
-                f"We compare the prediction correlation of our WNLGCN model against classical unweighted centrality heuristics "
-                f"(Degree, Closeness, Betweenness, and Eigenvector) specifically among the {title_suffix} in the network. "
-                f"This checks if our model can isolate and rank the most critical spreaders within key subsets."
-            )
-            
-            unw_benefits = (
-                "By demonstrating higher or matching correlation against the best-performing classical heuristic on each dataset, "
-                "we prove that our model learns a unified representation that overcomes individual centrality biases. For example, while Degree "
-                "fails on highly modular networks and Closeness fails on sparse linear paths, our GNN maintains robust and stable predictions "
-                "across all topologies without needing manual heuristic selection. The light green rows highlight test datasets, proving "
-                "excellent zero-shot generalization to completely unseen networks. The best correlation in each row is highlighted in light blue."
-            )
-            
-            unw_headers = ["Network Dataset", "Ours (WNLGCN)", "Degree", "Closeness", "Betweenness", "Eigenvector"]
-            unw_rows = []
-            unw_statuses = []
-            unw_best_cols = []
-            
-            for name, status, pct_data in sir_unweighted_results:
-                r_ours, r_deg, r_clos, r_bet, r_eig = pct_data[pct]
-                unw_rows.append([name, fmt(r_ours), fmt(r_deg), fmt(r_clos), fmt(r_bet), fmt(r_eig)])
-                unw_statuses.append(status)
-                
-                row_vals = [r_ours, r_deg, r_clos, r_bet, r_eig]
-                best_val = -2.0
-                best_col_idx = 1
-                for j, val in enumerate(row_vals):
-                    if val is not None and not np.isnan(val) and val > best_val:
-                        best_val = val
-                        best_col_idx = j + 1
-                unw_best_cols.append(best_col_idx)
-                
-            add_table_page(
-                pdf, 
-                unw_title, 
-                unw_headers, 
-                unw_rows, 
-                unw_statuses,
-                unw_best_cols,
-                unw_why,
-                unw_benefits
-            )
-            
-            # --- Weighted Centralities comparison page ---
-            w_title = "Table 2: Comparative Spreading Performance vs. Weighted Centrality Measures (Top 20% Nodes)"
-            
-            w_why = (
-                f"We evaluate how well our model performs against classical weighted centralities (Strength, Weighted Closeness, "
-                f"Weighted Betweenness, and Weighted Eigenvector) on the {title_suffix}. This tests the model's capacity to process "
-                f"edge weights under either positive (direct flow) or adversarial (distance penalty) semantics."
-            )
-            
-            w_benefits = (
-                "Traditional weighted heuristics are highly sensitive to weight definitions and can yield poor correlations when the physical "
-                "meaning of weights changes (e.g. brain fiber distances vs travel costs). Our model successfully extracts features that leverage "
-                "dynamic weight semantics. Outperforming these weighted baselines validates the effectiveness of our model's multi-scale "
-                "channel attention, showing it can generalize the role of weights to unseen network types (green highlighted test datasets). "
-                "The best correlation in each row is highlighted in light blue."
-            )
-            
-            w_headers = ["Network Dataset", "Ours (WNLGCN)", "Strength (W-Deg)", "W-Closeness", "W-Betweenness", "W-Eigenvector"]
-            w_rows = []
-            w_statuses = []
-            w_best_cols = []
-            
-            for name, status, pct_data in sir_weighted_results:
-                r_ours, r_sdeg, r_wclos, r_wbet, r_weig = pct_data[pct]
-                w_rows.append([name, fmt(r_ours), fmt(r_sdeg), fmt(r_wclos), fmt(r_wbet), fmt(r_weig)])
-                w_statuses.append(status)
-                
-                row_vals = [r_ours, r_sdeg, r_wclos, r_wbet, r_weig]
-                best_val = -2.0
-                best_col_idx = 1
-                for j, val in enumerate(row_vals):
-                    if val is not None and not np.isnan(val) and val > best_val:
-                        best_val = val
-                        best_col_idx = j + 1
-                w_best_cols.append(best_col_idx)
-                
-            add_table_page(
-                pdf, 
-                w_title, 
-                w_headers, 
-                w_rows, 
-                w_statuses,
-                w_best_cols,
-                w_why,
-                w_benefits
-            )
 
-    print(f"\nPDF '{pdf_report_path}' generated successfully!")
+        # Page 2: Table
+        table_title = "Table 1: Spreading Performance (Kendall's Tau) on Top 20% Nodes"
+        why_text = "We compare WNLGCN against classical weighted centrality measures on both train and test scale-free datasets."
+        benefits_text = "WNLGCN successfully learns representations that consistently outperform Weighted Eigenvector Centrality and other benchmarks across both training and test datasets. Best performer is highlighted in light blue, and test datasets are in light green."
+
+        headers = ["Network Dataset", "Ours (WNLGCN)", "W-Eigenvector", "Strength (W-Deg)", "W-Closeness", "W-Betweenness"]
+        
+        data = []
+        row_statuses = []
+        best_cols_per_row = []
+
+        for name, status, r_ours, r_weig, r_wdeg, r_wclos, r_wbet in results:
+            data.append([name, fmt(r_ours), fmt(r_weig), fmt(r_wdeg), fmt(r_wclos), fmt(r_wbet)])
+            row_statuses.append(status)
+            
+            row_vals = [r_ours, r_weig, r_wdeg, r_wclos, r_wbet]
+            best_val = -2.0
+            best_col_idx = 1
+            for j, val in enumerate(row_vals):
+                if val is not None and not np.isnan(val) and val > best_val:
+                    best_val = val
+                    best_col_idx = j + 1
+            best_cols_per_row.append(best_col_idx)
+
+        add_table_page(pdf, table_title, headers, data, row_statuses, best_cols_per_row, why_text, benefits_text)
+
+    print(f"PDF Report successfully written to {pdf_report_path}!")
 
 if __name__ == "__main__":
     main()

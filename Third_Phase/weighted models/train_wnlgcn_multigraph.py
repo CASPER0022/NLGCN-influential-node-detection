@@ -20,14 +20,13 @@ torch.manual_seed(42)
 
 # Path resolution relative to script file
 script_dir = os.path.dirname(os.path.abspath(__file__))
-datasets_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets"))
+datasets_dir = os.path.abspath(os.path.join(script_dir, "..", "..", "Datasets", "weighted Datasets"))
 # Cache results locally inside the weighted model folder
 results_dir = os.path.abspath(os.path.join(script_dir, "results"))
 os.makedirs(results_dir, exist_ok=True)
 
 # ---- Classification of Target Datasets with Edge Semantics ----
 target_datasets = {
-    "facebook_combined.txt": "positive",
     "Budapest.txt": "adversarial",
     "US_airports.txt": "positive",
     "netscience.mtx": "positive",
@@ -47,7 +46,7 @@ target_datasets = {
     "karate.txt": "positive"
 }
 
-# Training networks: 10 real-world weighted networks + 6 BBV synthetic training networks
+# Training networks: 10 real-world weighted networks + 10 Scale-Free training networks
 training_datasets = [
     "Budapest.txt",
     # "US_airports.txt",
@@ -59,12 +58,16 @@ training_datasets = [
     "open_flights.txt",
     "out.advogato",
     # "out.foldoc",
-    "synthetic_sf_weighted_train_100.txt",
-    "synthetic_sf_weighted_train_250.txt",
-    "synthetic_sf_weighted_train_500.txt",
-    "synthetic_sf_weighted_train_1000.txt",
-    "synthetic_sf_weighted_train_2500.txt",
-    "synthetic_sf_weighted_train_5000.txt"
+    "synthetic_sf_100.txt",
+    "synthetic_sf_250.txt",
+    "synthetic_sf_500.txt",
+    "synthetic_sf_850.txt",
+    "synthetic_sf_1000.txt",
+    "synthetic_sf_1500.txt",
+    "synthetic_sf_2000.txt",
+    "synthetic_sf_2500.txt",
+    "synthetic_sf_3000.txt",
+    "synthetic_sf_4000.txt"
 ]
 
 # ---- WNLGCN Model Definition (6 Channels, weighted variant) ----
@@ -326,7 +329,7 @@ def process_dataset(filepath, filename, semantics, L=40, precalculated_y=None):
         for u in G.nodes():
             adj_dict[u] = []
             for v in G.neighbors(u):
-                w = G[u][v].get('weight', 1.0)
+                w = G[u][v].get('weight_norm', 1.0)
                 p = 1.0 - (1.0 - beta) ** w
                 adj_dict[u].append((v, p))
 

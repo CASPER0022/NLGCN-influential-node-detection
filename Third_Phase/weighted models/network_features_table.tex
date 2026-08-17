@@ -1,0 +1,42 @@
+% Research Paper Table: Network Features of Weighted Datasets
+\begin{table*}[t]
+\centering
+\caption{Topological and weighted network features across training and testing benchmark datasets. $N$: Nodes, $M$: Edges, $\langle k \rangle$: Average Degree, $k_{max}$: Max Degree, $\langle w \rangle$: Average Edge Weight, $\langle s \rangle$: Average Node Strength, $\rho$: Graph Density, $C_{unw}$: Unweighted Clustering, $C_{w}$: Weighted Clustering, $APL$: Average Shortest Path Length of LCC, $D$: Diameter.}
+\label{tab:network_features}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{llrrrrrrrrrrr}
+\toprule
+Dataset & Split & $N$ & $M$ & $\langle k \rangle$ & $k_{max}$ & $\langle w \rangle$ & $\langle s \rangle$ & $\rho$ & $C_{unw}$ & $C_{w}$ & $APL$ & $D$ \\
+\midrule
+Budapest.txt & TRAIN & 480 & 989 & 4.12 & 94 & 4.95 & 20.39 & 0.0086 & 0.300 & 0.011 & 4.92 & 20 \\
+C\_elegans.txt & TRAIN & 297 & 2,148 & 14.46 & 134 & 3.95 & 57.10 & 0.0489 & 0.292 & 0.018 & 2.46 & 5 \\
+E.coli.edge & TRAIN & 1,100 & 3,637 & 6.61 & 152 & 1.36 & 9.02 & 0.0060 & 0.457 & 0.020 & 3.83 & 11 \\
+US\_airports.txt & TRAIN & 500 & 2,980 & 11.92 & 145 & 152320.19 & 1815656.66 & 0.0239 & 0.617 & 0.022 & 2.99 & 7 \\
+carrib.txt & TRAIN & 249 & 3,492 & 28.05 & 248 & 0.07 & 1.88 & 0.1131 & 0.400 & 0.001 & 1.89 & 2 \\
+open\_flights.txt & TRAIN & 2,939 & 15,677 & 10.67 & 242 & 1.46 & 15.60 & 0.0036 & 0.453 & 0.059 & 4.12 & 14 \\
+out.advogato & TRAIN & 5,155 & 39,285 & 15.24 & 803 & 0.85 & 13.00 & 0.0030 & 0.248 & 0.208 & 3.29 & 8 \\
+out.foldoc & TRAIN & 13,356 & 91,471 & 13.70 & 728 & 1.05 & 14.41 & 0.0010 & 0.338 & 0.023 & 3.88 & 7 \\
+synthetic\_sf\_100.txt & TRAIN & 100 & 384 & 7.68 & 23 & 0.84 & 6.43 & 0.0776 & 0.156 & 0.006 & 2.40 & 4 \\
+synthetic\_sf\_1000.txt & TRAIN & 1,000 & 3,984 & 7.97 & 117 & 1.08 & 8.59 & 0.0080 & 0.029 & 0.001 & 3.20 & 5 \\
+synthetic\_sf\_1500.txt & TRAIN & 1,500 & 5,984 & 7.98 & 132 & 1.08 & 8.65 & 0.0053 & 0.024 & 0.001 & 3.32 & 5 \\
+synthetic\_sf\_2000.txt & TRAIN & 2,000 & 7,984 & 7.98 & 156 & 1.15 & 9.18 & 0.0040 & 0.021 & 0.000 & 3.42 & 5 \\
+synthetic\_sf\_250.txt & TRAIN & 250 & 984 & 7.87 & 65 & 1.15 & 9.07 & 0.0316 & 0.115 & 0.004 & 2.68 & 4 \\
+synthetic\_sf\_2500.txt & TRAIN & 2,500 & 9,984 & 7.99 & 127 & 1.14 & 9.08 & 0.0032 & 0.017 & 0.000 & 3.49 & 6 \\
+synthetic\_sf\_3000.txt & TRAIN & 3,000 & 11,984 & 7.99 & 214 & 1.15 & 9.16 & 0.0027 & 0.015 & 0.000 & 3.56 & 6 \\
+synthetic\_sf\_4000.txt & TRAIN & 4,000 & 15,984 & 7.99 & 220 & 1.17 & 9.33 & 0.0020 & 0.014 & 0.000 & 3.63 & 6 \\
+synthetic\_sf\_500.txt & TRAIN & 500 & 1,984 & 7.94 & 61 & 1.03 & 8.15 & 0.0159 & 0.049 & 0.001 & 2.96 & 5 \\
+synthetic\_sf\_850.txt & TRAIN & 850 & 3,384 & 7.96 & 106 & 1.09 & 8.66 & 0.0094 & 0.044 & 0.001 & 3.12 & 5 \\
+\midrule
+cargoshipsBB.txt & TEST & 834 & 4,349 & 10.43 & 173 & 97.71 & 1019.04 & 0.0125 & 0.417 & 0.004 & 3.34 & 9 \\
+facebook\_combined.txt & TEST & 4,039 & 88,234 & 43.69 & 1045 & 1.00 & 43.69 & 0.0108 & 0.606 & 0.606 & 3.71 & 8 \\
+karate.txt & TEST & 34 & 78 & 4.59 & 17 & 1.00 & 4.59 & 0.1390 & 0.571 & 0.571 & 2.41 & 5 \\
+synthetic\_test\_realworld.txt & TEST & 800 & 3,184 & 7.96 & 111 & 1.00 & 7.96 & 0.0100 & 0.039 & 0.039 & 3.11 & 5 \\
+synthetic\_test\_sf\_1000.txt & TEST & 1,000 & 3,984 & 7.97 & 112 & 1.08 & 8.60 & 0.0080 & 0.037 & 0.001 & 3.19 & 5 \\
+synthetic\_test\_sf\_2000.txt & TEST & 2,000 & 7,984 & 7.98 & 168 & 1.08 & 8.66 & 0.0040 & 0.020 & 0.000 & 3.40 & 5 \\
+synthetic\_test\_sf\_250.txt & TEST & 250 & 984 & 7.87 & 50 & 0.94 & 7.43 & 0.0316 & 0.105 & 0.003 & 2.71 & 4 \\
+synthetic\_test\_sf\_500.txt & TEST & 500 & 1,984 & 7.94 & 72 & 1.05 & 8.35 & 0.0159 & 0.059 & 0.002 & 2.94 & 5 \\
+synthetic\_test\_sf\_5000.txt & TEST & 5,000 & 19,984 & 7.99 & 224 & 1.17 & 9.36 & 0.0016 & 0.011 & 0.000 & 3.69 & 6 \\
+\bottomrule
+\end{tabular}
+}
+\end{table*}

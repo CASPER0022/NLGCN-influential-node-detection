@@ -101,9 +101,9 @@ def main():
     ]
     # 2. Identify representative synthetic BBV networks (3 networks)
     synthetic_files = [
-        "synthetic_sf_weighted_train_250.txt",
-        "synthetic_sf_weighted_train_1000.txt",
-        "synthetic_sf_weighted_train_5000.txt"
+        "synthetic_sf_250.txt",
+        "synthetic_sf_1000.txt",
+        "synthetic_sf_4000.txt"
     ]
     
     datasets_to_plot = []
