@@ -123,7 +123,8 @@ def add_text_page(pdf, title, paragraphs):
     plt.close(fig)
 
 
-def add_table_page(pdf, title, headers, data, row_statuses, best_cols, why_text, benefits_text, fontsize=7.0):
+def add_table_page(pdf, title, headers, data, row_statuses, best_cols, why_text, benefits_text, fontsize=7.0,
+                   first_col_frac=None):
     n_rows = len(data)
     fig = plt.figure(figsize=(12, max(8.5, n_rows * 0.23 + 3.2)))
     ax = fig.add_axes([0, 0, 1, 1])
@@ -144,6 +145,10 @@ def add_table_page(pdf, title, headers, data, row_statuses, best_cols, why_text,
                      bbox=[0.04, 0.03, 0.92, y - 0.05])
     table.auto_set_font_size(False)
     table.set_fontsize(fontsize)
+    if first_col_frac:
+        others = (1.0 - first_col_frac) / (len(headers) - 1)
+        for (r, c), cell in table.get_celld().items():
+            cell.set_width(first_col_frac if c == 0 else others)
     for c in range(len(headers)):
         table[0, c].set_text_props(weight="bold", color="white")
         table[0, c].set_facecolor("#1F4E79")
