@@ -1,0 +1,17 @@
+variant,group,removed_component,test_tau20_ensemble,test_tau20_seed_mean,test_tau20_seed_std,delta_vs_full,pct_change,test_overlap20,val_tau20,wilcoxon_p,wins_vs_full,losses_vs_full
+full,Reference,"Complete Hybrid Global-Local model",0.7889,0.7879,0.0010,+0.0000,+0.00,0.8801,0.7920,nan,0,0
+local_only,Architecture,"Global descriptor branch",0.7119,0.7212,0.0040,-0.0770,-9.76,0.8557,0.7629,0.0267,5,12
+global_only,Architecture,"Local 6-channel CNN branch",0.7728,0.7734,0.0031,-0.0162,-2.05,0.8728,0.7862,0.0023,2,14
+no_attention,Architecture,"Channel attention",0.7860,0.7850,0.0009,-0.0030,-0.38,0.8772,0.7951,0.0113,3,13
+no_gate,Architecture,"Gated fusion (-> concatenation)",0.7850,0.7788,0.0061,-0.0040,-0.50,0.8797,0.7963,0.0038,2,14
+no_skip,Architecture,"Linear global shortcut",0.7882,0.7869,0.0010,-0.0007,-0.09,0.8788,0.7960,0.7174,7,9
+no_dynamics_feats,Global descriptors,"SIR-aware descriptors (T, DS, MF)",0.7801,0.7730,0.0027,-0.0089,-1.12,0.8760,0.7826,0.0113,3,13
+no_spectral_feats,Global descriptors,"Spectral descriptors (eig_W, PageRank)",0.7782,0.7814,0.0069,-0.0107,-1.36,0.8778,0.7966,0.0638,4,13
+no_structural_feats,Global descriptors,"Structural descriptors",0.7862,0.7846,0.0006,-0.0027,-0.35,0.8785,0.7988,0.0787,6,10
+no_sign_propagation,Global descriptors,"SIGN neighbour aggregation",0.7872,0.7829,0.0061,-0.0017,-0.22,0.8796,0.7987,0.7333,9,6
+no_rank_norm,Global descriptors,"Within-graph rank normalisation",0.7847,0.7887,0.0078,-0.0042,-0.54,0.8867,0.7522,0.4080,9,7
+mse_only,Training objective,"Ranking loss (Huber only)",0.7805,0.7791,0.0016,-0.0085,-1.08,0.8783,0.7888,0.0004,0,16
+uniform_pair_weights,Training objective,"Top-focused pair weighting",0.7894,0.7879,0.0017,+0.0004,+0.05,0.8794,0.7980,0.1118,10,5
+no_top_oversampling,Training objective,"Top-20% over-sampling",0.7879,0.7853,0.0026,-0.0011,-0.13,0.8790,0.7980,0.1788,5,11
+global_label_norm,Training objective,"Per-graph label standardisation",0.7803,0.7737,0.0054,-0.0086,-1.09,0.8777,0.7853,0.0072,4,12
+single_model,Ensembling,"Seed ensemble (single model, mean over seeds)",0.7879,0.7879,0.0010,-0.0010,-0.13,0.8794,0.7930,0.0557,4,12
