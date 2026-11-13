@@ -1,0 +1,341 @@
+index,id,household,site,age_group,sex,role,sars_cov_2,susceptible,smoker,bmi,sleeps_with_index,cared_by_index,index_age_group,index_sex,index_ct_cat1,index_ct_cat2,index_variant
+0,J008-001,J008,Klerksdorp,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+1,J008-002,J008,Klerksdorp,35-59,Male,Contact,Negative,Susceptible,Yes,Overweight,No,No,18-34,Female,25-35,<30,non-Alpha/Beta/Delta
+2,J008-004,J008,Klerksdorp,<5,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,18-34,Female,25-35,<30,non-Alpha/Beta/Delta
+3,J008-005,J008,Klerksdorp,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,18-34,Female,25-35,<30,non-Alpha/Beta/Delta
+4,J008-006,J008,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,18-34,Female,25-35,<30,non-Alpha/Beta/Delta
+5,J008-007,J008,Klerksdorp,18-34,Female,Contact,Negative,Susceptible,No,Normal weight,Yes,No,18-34,Female,25-35,<30,non-Alpha/Beta/Delta
+6,J009-001,J009,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+7,J009-002,J009,Klerksdorp,>=60,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,No,35-59,Female,25-35,<30,non-Alpha/Beta/Delta
+8,J010-001,J010,Klerksdorp,18-34,Male,Index,Positive,,Yes,Normal weight,Unknown,No,,,,,
+9,J010-002,J010,Klerksdorp,>=60,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Male,25-35,30-35,Variant Unknown
+10,J010-003,J010,Klerksdorp,18-34,Female,Contact,Negative,Susceptible,No,Overweight,No,No,18-34,Male,25-35,30-35,Variant Unknown
+11,J020-001,J020,Klerksdorp,18-34,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+12,J020-002,J020,Klerksdorp,>=60,Female,Contact,Positive,Susceptible,Yes,Obese,No,No,18-34,Male,<25,<30,Beta
+13,J020-003,J020,Klerksdorp,>=60,Male,Contact,Negative,Susceptible,Yes,Normal weight,No,No,18-34,Male,<25,<30,Beta
+14,J020-006,J020,Klerksdorp,5-12,Male,Contact,Negative,Susceptible,No,Overweight,No,No,18-34,Male,<25,<30,Beta
+15,J020-007,J020,Klerksdorp,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Male,<25,<30,Beta
+16,J021-001,J021,Klerksdorp,35-59,Female,Index,Positive,,Unknown,Unknown,Unknown,No,,,,,
+17,J021-002,J021,Klerksdorp,18-34,Female,Contact,Negative,Susceptible,Unknown,Unknown,No,No,35-59,Female,<25,<30,Beta
+18,J021-003,J021,Klerksdorp,<5,Male,Contact,Negative,Susceptible,No,Unknown,Yes,No,35-59,Female,<25,<30,Beta
+19,J022-001,J022,Klerksdorp,35-59,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+20,J022-003,J022,Klerksdorp,5-12,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,<30,Beta
+21,J022-004,J022,Klerksdorp,13-17,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,<30,Beta
+22,J023-001,J023,Klerksdorp,18-34,Male,Index,Positive,,No,Obese,Unknown,No,,,,,
+23,J023-002,J023,Klerksdorp,>=60,Female,Contact,Negative,Susceptible,No,Obese,No,No,18-34,Male,25-35,30-35,Beta
+24,J023-004,J023,Klerksdorp,18-34,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Male,25-35,30-35,Beta
+25,J023-005,J023,Klerksdorp,18-34,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Male,25-35,30-35,Beta
+26,J023-006,J023,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Male,25-35,30-35,Beta
+27,J023-008,J023,Klerksdorp,5-12,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Male,25-35,30-35,Beta
+28,J024-001,J024,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+29,J024-002,J024,Klerksdorp,35-59,Male,Contact,Negative,Susceptible,Yes,Normal weight,Yes,No,35-59,Female,<25,<30,Beta
+30,J024-004,J024,Klerksdorp,13-17,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Beta
+31,J027-001,J027,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+32,J027-002,J027,Klerksdorp,35-59,Male,Contact,Negative,Susceptible,Yes,Normal weight,Yes,No,35-59,Female,<25,<30,Beta
+33,J027-003,J027,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+34,J027-004,J027,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Beta
+35,J027-005,J027,Klerksdorp,18-34,Male,Contact,Negative,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Beta
+36,J029-001,J029,Klerksdorp,35-59,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+37,J029-002,J029,Klerksdorp,35-59,Male,Contact,Negative,Susceptible,No,Overweight,Yes,No,35-59,Female,25-35,30-35,Beta
+38,J029-003,J029,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,25-35,30-35,Beta
+39,J030-001,J030,Klerksdorp,35-59,Male,Index,Positive,,Yes,Underweight,Unknown,No,,,,,
+40,J030-003,J030,Klerksdorp,5-12,Male,Contact,Negative,Susceptible,No,Unknown,No,No,35-59,Male,<25,<30,Beta
+41,J030-004,J030,Klerksdorp,5-12,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Male,<25,<30,Beta
+42,J031-001,J031,Klerksdorp,>=60,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+43,J031-002,J031,Klerksdorp,>=60,Female,Contact,Negative,Susceptible,No,Obese,Yes,No,>=60,Male,25-35,30-35,Beta
+44,J033-001,J033,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+45,J033-002,J033,Klerksdorp,>=60,Female,Contact,Negative,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+46,J033-005,J033,Klerksdorp,13-17,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Beta
+47,J033-007,J033,Klerksdorp,5-12,Female,Contact,Negative,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Beta
+48,J033-008,J033,Klerksdorp,5-12,Female,Contact,Negative,Susceptible,No,Overweight,Yes,No,35-59,Female,<25,<30,Beta
+49,J037-001,J037,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+50,J037-002,J037,Klerksdorp,35-59,Male,Contact,Positive,Susceptible,Yes,Normal weight,Yes,No,35-59,Female,25-35,30-35,Beta
+51,J037-003,J037,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,25-35,30-35,Beta
+52,J037-004,J037,Klerksdorp,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,Yes,35-59,Female,25-35,30-35,Beta
+53,J039-001,J039,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+54,J039-002,J039,Klerksdorp,35-59,Male,Contact,Negative,Susceptible,Yes,Underweight,No,No,35-59,Female,<25,<30,Beta
+55,J039-003,J039,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+56,J039-005,J039,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,35-59,Female,<25,<30,Beta
+57,J039-006,J039,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,35-59,Female,<25,<30,Beta
+58,J039-007,J039,Klerksdorp,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Beta
+59,J041-001,J041,Klerksdorp,18-34,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+60,J041-002,J041,Klerksdorp,>=60,Male,Contact,Positive,Susceptible,No,Overweight,No,No,18-34,Female,<25,<30,Beta
+61,J041-003,J041,Klerksdorp,>=60,Female,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,<25,<30,Beta
+62,J041-004,J041,Klerksdorp,35-59,Male,Contact,Negative,Susceptible,Yes,Normal weight,No,No,18-34,Female,<25,<30,Beta
+63,J041-005,J041,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Overweight,Yes,No,18-34,Female,<25,<30,Beta
+64,J042-001,J042,Klerksdorp,35-59,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+65,J042-003,J042,Klerksdorp,>=60,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,25-35,<30,Beta
+66,J042-004,J042,Klerksdorp,5-12,Male,Contact,Negative,Susceptible,No,Overweight,No,No,35-59,Male,25-35,<30,Beta
+67,J043-001,J043,Klerksdorp,18-34,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+68,J043-002,J043,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Overweight,Yes,No,18-34,Male,25-35,30-35,Beta
+69,J043-003,J043,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Underweight,No,No,18-34,Male,25-35,30-35,Beta
+70,J043-004,J043,Klerksdorp,18-34,Male,Contact,Negative,Susceptible,Yes,Normal weight,No,No,18-34,Male,25-35,30-35,Beta
+71,J043-005,J043,Klerksdorp,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Male,25-35,30-35,Beta
+72,J043-006,J043,Klerksdorp,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Male,25-35,30-35,Beta
+73,J044-001,J044,Klerksdorp,18-34,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+74,J044-002,J044,Klerksdorp,35-59,Male,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,25-35,30-35,Beta
+75,J044-003,J044,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,25-35,30-35,Beta
+76,J044-004,J044,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,18-34,Female,25-35,30-35,Beta
+77,J044-005,J044,Klerksdorp,18-34,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+78,J044-006,J044,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,18-34,Female,25-35,30-35,Beta
+79,J044-007,J044,Klerksdorp,5-12,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+80,J047-001,J047,Klerksdorp,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+81,J047-002,J047,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,25-35,<30,Beta
+82,J047-003,J047,Klerksdorp,18-34,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,<30,Beta
+83,J048-001,J048,Klerksdorp,>=60,Male,Index,Positive,,Yes,Normal weight,Unknown,No,,,,,
+84,J048-002,J048,Klerksdorp,35-59,Female,Contact,Negative,Susceptible,No,Overweight,No,No,>=60,Male,>35,>35,Variant Unknown
+85,J048-003,J048,Klerksdorp,13-17,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,>=60,Male,>35,>35,Variant Unknown
+86,J048-004,J048,Klerksdorp,13-17,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,>=60,Male,>35,>35,Variant Unknown
+87,J048-005,J048,Klerksdorp,5-12,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,>=60,Male,>35,>35,Variant Unknown
+88,J050-001,J050,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+89,J050-002,J050,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Female,25-35,30-35,Beta
+90,J050-003,J050,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,25-35,30-35,Beta
+91,J050-004,J050,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,25-35,30-35,Beta
+92,J053-001,J053,Klerksdorp,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+93,J053-002,J053,Klerksdorp,35-59,Female,Contact,Negative,Susceptible,No,Obese,Yes,No,18-34,Female,>35,>35,Variant Unknown
+94,J053-003,J053,Klerksdorp,<5,Female,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,18-34,Female,>35,>35,Variant Unknown
+95,J054-001,J054,Klerksdorp,35-59,Male,Index,Positive,,No,Obese,Unknown,No,,,,,
+96,J054-002,J054,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,Yes,Obese,Yes,No,35-59,Male,25-35,<30,Alpha
+97,J054-003,J054,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,Yes,Obese,No,No,35-59,Male,25-35,<30,Alpha
+98,J054-004,J054,Klerksdorp,13-17,Male,Contact,Positive,Susceptible,Yes,Normal weight,No,No,35-59,Male,25-35,<30,Alpha
+99,J055-001,J055,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+100,J055-004,J055,Klerksdorp,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,<25,<30,Beta
+101,J057-001,J057,Klerksdorp,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+102,J057-002,J057,Klerksdorp,18-34,Male,Contact,Positive,Susceptible,Yes,Overweight,Yes,No,18-34,Female,25-35,<30,Beta
+103,J057-003,J057,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,<30,Beta
+104,J057-004,J057,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Overweight,No,No,18-34,Female,25-35,<30,Beta
+105,J059-001,J059,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+106,J059-002,J059,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Overweight,No,Yes,35-59,Female,25-35,30-35,Beta
+107,J059-003,J059,Klerksdorp,5-12,Female,Contact,Positive,Susceptible,No,Overweight,No,Yes,35-59,Female,25-35,30-35,Beta
+108,J059-004,J059,Klerksdorp,<5,Male,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,25-35,30-35,Beta
+109,J059-005,J059,Klerksdorp,<5,Female,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,25-35,30-35,Beta
+110,J063-001,J063,Klerksdorp,18-34,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+111,J063-002,J063,Klerksdorp,35-59,Male,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,<25,<30,Alpha
+112,J063-003,J063,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,<25,<30,Alpha
+113,J063-004,J063,Klerksdorp,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,18-34,Female,<25,<30,Alpha
+114,J063-005,J063,Klerksdorp,5-12,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,<25,<30,Alpha
+115,J064-001,J064,Klerksdorp,35-59,Male,Index,Positive,,Yes,Overweight,Unknown,No,,,,,
+116,J064-002,J064,Klerksdorp,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Male,<25,<30,Beta
+117,J064-003,J064,Klerksdorp,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,Yes,35-59,Male,<25,<30,Beta
+118,J067-001,J067,Klerksdorp,35-59,Female,Index,Positive,,Yes,Overweight,Unknown,No,,,,,
+119,J067-002,J067,Klerksdorp,35-59,Male,Contact,Positive,Susceptible,Yes,Underweight,Yes,No,35-59,Female,<25,<30,Alpha
+120,J067-005,J067,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,35-59,Female,<25,<30,Alpha
+121,J067-006,J067,Klerksdorp,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,35-59,Female,<25,<30,Alpha
+122,J067-007,J067,Klerksdorp,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,<25,<30,Alpha
+123,J068-001,J068,Klerksdorp,18-34,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+124,J068-002,J068,Klerksdorp,18-34,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,<30,Beta
+125,J070-001,J070,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+126,J070-002,J070,Klerksdorp,35-59,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,No,35-59,Female,<25,<30,Beta
+127,J070-003,J070,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Underweight,No,No,35-59,Female,<25,<30,Beta
+128,J070-004,J070,Klerksdorp,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Beta
+129,J072-001,J072,Klerksdorp,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+130,J072-003,J072,Klerksdorp,18-34,Male,Contact,Negative,Susceptible,No,Underweight,No,No,35-59,Female,25-35,<30,Variant Unknown
+131,J073-001,J073,Klerksdorp,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+132,J073-002,J073,Klerksdorp,35-59,Male,Contact,Positive,Susceptible,No,Overweight,Yes,No,18-34,Female,<25,<30,Beta
+133,J073-003,J073,Klerksdorp,>=60,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,<25,<30,Beta
+134,J075-001,J075,Klerksdorp,18-34,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+135,J075-003,J075,Klerksdorp,5-12,Male,Contact,Negative,Susceptible,No,Overweight,Yes,Yes,18-34,Female,<25,<30,Alpha
+136,J075-004,J075,Klerksdorp,5-12,Female,Contact,Positive,Susceptible,No,Obese,Yes,Yes,18-34,Female,<25,<30,Alpha
+137,J076-001,J076,Klerksdorp,18-34,Female,Index,Positive,,Yes,Normal weight,Unknown,No,,,,,
+138,J076-002,J076,Klerksdorp,18-34,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,18-34,Female,<25,<30,Delta
+139,J077-001,J077,Klerksdorp,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+140,J077-002,J077,Klerksdorp,35-59,Female,Contact,Negative,Susceptible,No,Obese,No,No,>=60,Female,>35,>35,Beta
+141,J077-003,J077,Klerksdorp,13-17,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,>=60,Female,>35,>35,Beta
+142,J077-005,J077,Klerksdorp,13-17,Female,Contact,Negative,Susceptible,No,Obese,No,No,>=60,Female,>35,>35,Beta
+143,S004-001,S004,Soweto,35-59,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+144,S004-002,S004,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Obese,Yes,No,35-59,Male,>35,>35,non-Alpha/Beta/Delta
+145,S004-003,S004,Soweto,>=60,Male,Contact,Negative,Susceptible,Yes,Overweight,No,No,35-59,Male,>35,>35,non-Alpha/Beta/Delta
+146,S005-001,S005,Soweto,35-59,Male,Index,Positive,,Yes,Normal weight,Unknown,No,,,,,
+147,S005-002,S005,Soweto,18-34,Female,Contact,Negative,Susceptible,No,Normal weight,Yes,No,35-59,Male,>35,>35,Variant Unknown
+148,S005-003,S005,Soweto,<5,Female,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,35-59,Male,>35,>35,Variant Unknown
+149,S006-001,S006,Soweto,35-59,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+150,S006-003,S006,Soweto,35-59,Female,Contact,Negative,Susceptible,Yes,Underweight,No,No,35-59,Female,<25,<30,Beta
+151,S006-004,S006,Soweto,18-34,Female,Contact,Negative,Susceptible,Yes,Normal weight,No,No,35-59,Female,<25,<30,Beta
+152,S006-006,S006,Soweto,18-34,Male,Contact,Positive,Susceptible,Yes,Underweight,No,No,35-59,Female,<25,<30,Beta
+153,S006-008,S006,Soweto,18-34,Male,Contact,Negative,Susceptible,Yes,Underweight,Yes,No,35-59,Female,<25,<30,Beta
+154,S006-010,S006,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+155,S007-001,S007,Soweto,35-59,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+156,S007-002,S007,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,25-35,30-35,Beta
+157,S007-003,S007,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,30-35,Beta
+158,S007-004,S007,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Male,25-35,30-35,Beta
+159,S007-005,S007,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,30-35,Beta
+160,S007-006,S007,Soweto,35-59,Female,Contact,Negative,Susceptible,Yes,Overweight,No,No,35-59,Male,25-35,30-35,Beta
+161,S007-007,S007,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Male,25-35,30-35,Beta
+162,S007-008,S007,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,30-35,Beta
+163,S008-001,S008,Soweto,18-34,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+164,S008-002,S008,Soweto,18-34,Male,Contact,Negative,Susceptible,Yes,Normal weight,Yes,No,18-34,Female,25-35,30-35,Beta
+165,S008-003,S008,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,18-34,Female,25-35,30-35,Beta
+166,S009-001,S009,Soweto,35-59,Male,Index,Positive,,Yes,Normal weight,Unknown,No,,,,,
+167,S009-002,S009,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,25-35,<30,Beta
+168,S009-003,S009,Soweto,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,<30,Beta
+169,S011-001,S011,Soweto,35-59,Female,Index,Positive,,No,Underweight,Unknown,No,,,,,
+170,S011-002,S011,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,25-35,30-35,Beta
+171,S011-003,S011,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,25-35,30-35,Beta
+172,S011-004,S011,Soweto,5-12,Female,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,25-35,30-35,Beta
+173,S011-005,S011,Soweto,5-12,Female,Contact,Negative,Susceptible,No,Normal weight,No,Yes,35-59,Female,25-35,30-35,Beta
+174,S012-001,S012,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+175,S012-002,S012,Soweto,35-59,Male,Contact,Positive,Susceptible,Yes,Overweight,Yes,No,35-59,Female,25-35,<30,Beta
+176,S012-003,S012,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Overweight,No,Yes,35-59,Female,25-35,<30,Beta
+177,S015-001,S015,Soweto,35-59,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+178,S015-002,S015,Soweto,>=60,Male,Contact,Positive,Susceptible,Yes,Normal weight,No,No,35-59,Female,<25,<30,Beta
+179,S015-003,S015,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Underweight,Yes,No,35-59,Female,<25,<30,Beta
+180,S015-004,S015,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Female,<25,<30,Beta
+181,S016-001,S016,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+182,S016-002,S016,Soweto,18-34,Male,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+183,S016-003,S016,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Overweight,No,Yes,35-59,Female,<25,<30,Beta
+184,S018-001,S018,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+185,S018-003,S018,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+186,S018-004,S018,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Overweight,Yes,Yes,35-59,Female,<25,<30,Beta
+187,S018-005,S018,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,<25,<30,Beta
+188,S020-001,S020,Soweto,18-34,Male,Index,Positive,,No,Obese,Unknown,No,,,,,
+189,S020-002,S020,Soweto,18-34,Female,Contact,Negative,Susceptible,No,Obese,Yes,No,18-34,Male,<25,<30,Beta
+190,S021-001,S021,Soweto,35-59,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+191,S021-002,S021,Soweto,>=60,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Beta
+192,S021-003,S021,Soweto,>=60,Female,Contact,Negative,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+193,S021-004,S021,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Beta
+194,S021-005,S021,Soweto,18-34,Male,Contact,Negative,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Beta
+195,S021-006,S021,Soweto,13-17,Female,Contact,Negative,Susceptible,No,Overweight,Yes,Yes,35-59,Female,<25,<30,Beta
+196,S023-001,S023,Soweto,35-59,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+197,S023-002,S023,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Male,25-35,<30,Beta
+198,S023-003,S023,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,25-35,<30,Beta
+199,S026-001,S026,Soweto,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+200,S026-003,S026,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Overweight,Yes,No,18-34,Female,25-35,30-35,Beta
+201,S026-005,S026,Soweto,13-17,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+202,S026-007,S026,Soweto,18-34,Male,Contact,Negative,Susceptible,Yes,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+203,S026-008,S026,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+204,S026-009,S026,Soweto,13-17,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+205,S028-001,S028,Soweto,35-59,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+206,S028-002,S028,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Obese,Yes,No,35-59,Male,<25,<30,Beta
+207,S028-003,S028,Soweto,>=60,Female,Contact,Negative,Susceptible,No,Obese,No,No,35-59,Male,<25,<30,Beta
+208,S028-004,S028,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Male,<25,<30,Beta
+209,S028-005,S028,Soweto,18-34,Male,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,<25,<30,Beta
+210,S030-001,S030,Soweto,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+211,S030-002,S030,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Obese,No,No,>=60,Female,<25,<30,Beta
+212,S031-001,S031,Soweto,18-34,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+213,S031-002,S031,Soweto,18-34,Male,Contact,Negative,Susceptible,No,Normal weight,Yes,No,18-34,Female,<25,<30,Beta
+214,S031-003,S031,Soweto,18-34,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,<25,<30,Beta
+215,S031-005,S031,Soweto,<5,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,18-34,Female,<25,<30,Beta
+216,S032-001,S032,Soweto,18-34,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+217,S032-005,S032,Soweto,18-34,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,18-34,Female,25-35,30-35,Beta
+218,S033-001,S033,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+219,S033-002,S033,Soweto,35-59,Male,Contact,Negative,Susceptible,Yes,Normal weight,Yes,No,35-59,Female,Unknown,Unknown,Beta
+220,S033-003,S033,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,Unknown,Unknown,Beta
+221,S033-004,S033,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,No,Yes,35-59,Female,Unknown,Unknown,Beta
+222,S036-001,S036,Soweto,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+223,S036-002,S036,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,>=60,Female,<25,<30,Beta
+224,S036-003,S036,Soweto,<5,Male,Contact,Negative,Susceptible,No,Normal weight,Yes,No,>=60,Female,<25,<30,Beta
+225,S036-004,S036,Soweto,<5,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,>=60,Female,<25,<30,Beta
+226,S039-001,S039,Soweto,35-59,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+227,S039-002,S039,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Male,<25,<30,Beta
+228,S039-003,S039,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Male,<25,<30,Beta
+229,S039-004,S039,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,<25,<30,Beta
+230,S040-001,S040,Soweto,>=60,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+231,S040-002,S040,Soweto,>=60,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,>=60,Male,25-35,<30,Beta
+232,S040-003,S040,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,>=60,Male,25-35,<30,Beta
+233,S040-004,S040,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,>=60,Male,25-35,<30,Beta
+234,S044-001,S044,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+235,S044-002,S044,Soweto,35-59,Male,Contact,Negative,Susceptible,No,Underweight,Yes,No,35-59,Female,<25,<30,Beta
+236,S044-003,S044,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Beta
+237,S045-001,S045,Soweto,35-59,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+238,S045-002,S045,Soweto,>=60,Male,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,25-35,<30,Beta
+239,S045-003,S045,Soweto,>=60,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,25-35,<30,Beta
+240,S045-004,S045,Soweto,35-59,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Female,25-35,<30,Beta
+241,S045-005,S045,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,25-35,<30,Beta
+242,S045-006,S045,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,25-35,<30,Beta
+243,S046-001,S046,Soweto,>=60,Male,Index,Positive,,No,Underweight,Unknown,No,,,,,
+244,S046-002,S046,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Overweight,No,No,>=60,Male,<25,<30,Beta
+245,S047-001,S047,Soweto,35-59,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+246,S047-003,S047,Soweto,<5,Male,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,>35,>35,Beta
+247,S048-001,S048,Soweto,>=60,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+248,S048-002,S048,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,>=60,Male,<25,<30,Beta
+249,S048-005,S048,Soweto,18-34,Male,Contact,Positive,Susceptible,No,Overweight,No,No,>=60,Male,<25,<30,Beta
+250,S048-006,S048,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,>=60,Male,<25,<30,Beta
+251,S049-001,S049,Soweto,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+252,S049-003,S049,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Overweight,No,No,>=60,Female,25-35,<30,Beta
+253,S049-004,S049,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Obese,No,No,>=60,Female,25-35,<30,Beta
+254,S049-005,S049,Soweto,35-59,Male,Contact,Negative,Susceptible,Yes,Underweight,Yes,No,>=60,Female,25-35,<30,Beta
+255,S050-001,S050,Soweto,18-34,Male,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+256,S050-002,S050,Soweto,>=60,Female,Contact,Negative,Susceptible,No,Overweight,No,No,18-34,Male,<25,<30,Beta
+257,S050-003,S050,Soweto,35-59,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Male,<25,<30,Beta
+258,S050-004,S050,Soweto,18-34,Male,Contact,Positive,Susceptible,No,Underweight,Yes,No,18-34,Male,<25,<30,Beta
+259,S050-005,S050,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Normal weight,No,Yes,18-34,Male,<25,<30,Beta
+260,S051-001,S051,Soweto,35-59,Male,Index,Positive,,No,Overweight,Unknown,No,,,,,
+261,S051-004,S051,Soweto,18-34,Female,Contact,Negative,Susceptible,No,Overweight,No,No,35-59,Male,25-35,<30,Beta
+262,S052-001,S052,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+263,S052-002,S052,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,35-59,Female,<25,<30,non-Alpha/Beta/Delta
+264,S052-003,S052,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Obese,No,Yes,35-59,Female,<25,<30,non-Alpha/Beta/Delta
+265,S053-001,S053,Soweto,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+266,S053-002,S053,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,>=60,Female,<25,<30,Beta
+267,S053-003,S053,Soweto,35-59,Male,Contact,Positive,Susceptible,No,Obese,No,No,>=60,Female,<25,<30,Beta
+268,S056-001,S056,Soweto,35-59,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+269,S056-003,S056,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,>35,>35,Variant Unknown
+270,S056-004,S056,Soweto,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,>35,>35,Variant Unknown
+271,S057-001,S057,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+272,S057-002,S057,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Beta
+273,S057-003,S057,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,No,Yes,35-59,Female,<25,<30,Beta
+274,S057-004,S057,Soweto,<5,Male,Contact,Negative,Susceptible,No,Underweight,No,Yes,35-59,Female,<25,<30,Beta
+275,S060-001,S060,Soweto,18-34,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+276,S060-002,S060,Soweto,35-59,Male,Contact,Negative,Susceptible,Yes,Overweight,No,No,18-34,Female,<25,<30,Delta
+277,S060-003,S060,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Obese,No,No,18-34,Female,<25,<30,Delta
+278,S060-004,S060,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Overweight,Yes,Yes,18-34,Female,<25,<30,Delta
+279,S061-001,S061,Soweto,>=60,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+280,S061-002,S061,Soweto,35-59,Male,Contact,Positive,Susceptible,Yes,Underweight,No,No,>=60,Female,<25,<30,non-Alpha/Beta/Delta
+281,S061-003,S061,Soweto,35-59,Male,Contact,Positive,Susceptible,Yes,Normal weight,No,No,>=60,Female,<25,<30,non-Alpha/Beta/Delta
+282,S061-004,S061,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Overweight,No,No,>=60,Female,<25,<30,non-Alpha/Beta/Delta
+283,S061-005,S061,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Underweight,No,No,>=60,Female,<25,<30,non-Alpha/Beta/Delta
+284,S062-001,S062,Soweto,18-34,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+285,S062-002,S062,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Overweight,No,No,18-34,Female,<25,<30,Delta
+286,S062-003,S062,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,No,18-34,Female,<25,<30,Delta
+287,S062-005,S062,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Overweight,Yes,No,18-34,Female,<25,<30,Delta
+288,S062-007,S062,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Female,<25,<30,Delta
+289,S063-001,S063,Soweto,18-34,Female,Index,Positive,,No,Overweight,Unknown,No,,,,,
+290,S063-002,S063,Soweto,35-59,Male,Contact,Positive,Susceptible,Yes,Underweight,No,No,18-34,Female,<25,<30,Delta
+291,S063-003,S063,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,18-34,Female,<25,<30,Delta
+292,S063-004,S063,Soweto,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,18-34,Female,<25,<30,Delta
+293,S064-001,S064,Soweto,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+294,S064-002,S064,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Overweight,No,No,>=60,Female,<25,<30,Beta
+295,S064-004,S064,Soweto,35-59,Male,Contact,Positive,Susceptible,Yes,Underweight,No,No,>=60,Female,<25,<30,Beta
+296,S067-001,S067,Soweto,35-59,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+297,S067-002,S067,Soweto,18-34,Male,Contact,Positive,Susceptible,Yes,Normal weight,No,No,35-59,Female,>35,>35,Delta
+298,S067-003,S067,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,>35,>35,Delta
+299,S067-004,S067,Soweto,18-34,Female,Contact,Negative,Susceptible,No,Normal weight,No,No,35-59,Female,>35,>35,Delta
+300,S070-001,S070,Soweto,>=60,Male,Index,Positive,,No,Obese,Unknown,No,,,,,
+301,S070-002,S070,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,Yes,No,>=60,Male,<25,<30,Delta
+302,S070-003,S070,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,>=60,Male,<25,<30,Delta
+303,S071-001,S071,Soweto,>=60,Female,Index,Positive,,No,Normal weight,Unknown,No,,,,,
+304,S071-002,S071,Soweto,>=60,Male,Contact,Positive,Susceptible,No,Normal weight,Yes,No,>=60,Female,<25,<30,Delta
+305,S071-004,S071,Soweto,13-17,Male,Contact,Positive,Susceptible,No,Overweight,No,Yes,>=60,Female,<25,<30,Delta
+306,S071-005,S071,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,No,Yes,>=60,Female,<25,<30,Delta
+307,S071-006,S071,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Normal weight,No,Yes,>=60,Female,<25,<30,Delta
+308,S071-008,S071,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,Yes,>=60,Female,<25,<30,Delta
+309,S072-001,S072,Soweto,35-59,Male,Index,Positive,,No,Obese,Unknown,No,,,,,
+310,S072-004,S072,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Male,25-35,<30,Delta
+311,S072-005,S072,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Male,25-35,<30,Delta
+312,S072-006,S072,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,<30,Delta
+313,S072-007,S072,Soweto,5-12,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Male,25-35,<30,Delta
+314,S072-008,S072,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Obese,Yes,No,35-59,Male,25-35,<30,Delta
+315,S073-001,S073,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+316,S073-002,S073,Soweto,35-59,Male,Contact,Positive,Susceptible,Yes,Normal weight,Yes,No,35-59,Female,<25,<30,Delta
+317,S073-003,S073,Soweto,18-34,Female,Contact,Positive,Susceptible,Unknown,Unknown,No,No,35-59,Female,<25,<30,Delta
+318,S073-004,S073,Soweto,13-17,Male,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Delta
+319,S074-001,S074,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+320,S074-002,S074,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,25-35,<30,Beta
+321,S074-003,S074,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,25-35,<30,Beta
+322,S074-004,S074,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Overweight,No,Yes,35-59,Female,25-35,<30,Beta
+323,S075-001,S075,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+324,S075-002,S075,Soweto,>=60,Female,Contact,Positive,Susceptible,No,Obese,No,No,35-59,Female,<25,<30,Delta
+325,S075-003,S075,Soweto,35-59,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Delta
+326,S075-004,S075,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Delta
+327,S078-001,S078,Soweto,>=60,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+328,S078-002,S078,Soweto,18-34,Female,Contact,Negative,Susceptible,No,Overweight,No,No,>=60,Female,<25,<30,Delta
+329,S078-003,S078,Soweto,5-12,Male,Contact,Negative,Susceptible,No,Normal weight,No,No,>=60,Female,<25,<30,Delta
+330,S079-001,S079,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+331,S079-003,S079,Soweto,>=60,Female,Contact,Positive,Susceptible,No,Normal weight,No,No,35-59,Female,<25,<30,Delta
+332,S079-004,S079,Soweto,18-34,Female,Contact,Positive,Susceptible,No,Overweight,No,No,35-59,Female,<25,<30,Delta
+333,S079-005,S079,Soweto,13-17,Female,Contact,Positive,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,<25,<30,Delta
+334,S079-006,S079,Soweto,5-12,Female,Contact,Positive,Susceptible,No,Obese,Yes,Yes,35-59,Female,<25,<30,Delta
+335,S080-001,S080,Soweto,18-34,Male,Index,Positive,,Yes,Normal weight,Unknown,No,,,,,
+336,S080-002,S080,Soweto,35-59,Male,Contact,Negative,Susceptible,Yes,Normal weight,No,No,18-34,Male,>35,>35,Variant Unknown
+337,S080-003,S080,Soweto,35-59,Female,Contact,Negative,Susceptible,No,Obese,No,No,18-34,Male,>35,>35,Variant Unknown
+338,S081-001,S081,Soweto,35-59,Female,Index,Positive,,No,Obese,Unknown,No,,,,,
+339,S081-003,S081,Soweto,13-17,Male,Contact,Negative,Susceptible,No,Normal weight,Yes,Yes,35-59,Female,<25,<30,Variant Unknown
