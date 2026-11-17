@@ -1,0 +1,56 @@
+Step 1: SIR labels and features
+  prepared LH10_Hospital              n=   75  beta=0.742  mean outbreak=0.16  (0s)
+  prepared LyonSchool_Primary         n=  242  beta=0.716  mean outbreak=0.34  (0s)
+  prepared Thiers11_HighSchool        n=  126  beta=0.900  mean outbreak=0.03  (0s)
+  prepared Thiers12_HighSchool        n=  180  beta=0.900  mean outbreak=0.02  (0s)
+  prepared Thiers13_HighSchool        n=  327  beta=0.900  mean outbreak=0.01  (0s)
+  prepared InVS13_Workplace           n=   92  beta=0.900  mean outbreak=0.03  (0s)
+  prepared InVS15_Workplace           n=  217  beta=0.900  mean outbreak=0.10  (0s)
+  prepared SFHH_Conference            n=  403  beta=0.900  mean outbreak=0.01  (0s)
+  prepared HT09_Conference            n=  113  beta=0.900  mean outbreak=0.03  (0s)
+  prepared Infectious_Museum          n=  410  beta=0.900  mean outbreak=0.01  (0s)
+  prepared Malawi_Village             n=   84  beta=0.900  mean outbreak=0.03  (0s)
+  prepared Kenya_Households           n=   47  beta=0.900  mean outbreak=0.20  (0s)
+  prepared Utah_MiddleSchool          n=  591  beta=0.384  mean outbreak=0.41  (0s)
+  prepared Utah_ElementarySchool      n=  339  beta=0.280  mean outbreak=0.01  (0s)
+  prepared Utah_MiddleSchool_1m       n=  590  beta=0.873  mean outbreak=0.77  (0s)
+  prepared Utah_ElementarySchool_1m   n=  339  beta=0.250  mean outbreak=0.00  (0s)
+  prepared Copenhagen_BT              n=  675  beta=0.900  mean outbreak=0.05  (0s)
+  prepared RealityMining_BT           n=   96  beta=0.581  mean outbreak=0.05  (0s)
+  prepared Haggle_Infocom05           n=  274  beta=0.900  mean outbreak=0.02  (0s)
+  prepared LH10_Hospital_Coloc        n=   73  beta=0.661  mean outbreak=0.09  (0s)
+  prepared InVS13_Workplace_Coloc     n=   95  beta=0.505  mean outbreak=0.14  (0s)
+  prepared InVS15_Workplace_Coloc     n=  219  beta=0.656  mean outbreak=0.23  (0s)
+  prepared SFHH_Conference_Coloc      n=  403  beta=0.271  mean outbreak=0.16  (0s)
+  prepared LyonSchool_Primary_Coloc   n=  242  beta=0.060  mean outbreak=0.23  (0s)
+  prepared Thiers13_HighSchool_Coloc  n=  328  beta=0.053  mean outbreak=0.08  (0s)
+  prepared Thiers13_Diaries           n=  120  beta=0.231  mean outbreak=0.04  (0s)
+Step 2: zero-shot scoring
+                  dataset  Hybrid G-L (ours)  Prev. Deep 6-Ch  W-Eigenvector  Strength (W-Deg)  W-Closeness  W-Betweenness
+            LH10_Hospital              0.810            0.486          0.619             0.810        0.524          0.517
+       LyonSchool_Primary              0.670            0.285          0.441             0.690        0.420          0.420
+      Thiers11_HighSchool              0.807            0.260          0.433             0.595        0.173          0.147
+      Thiers12_HighSchool              0.743            0.505          0.330             0.438        0.244          0.111
+      Thiers13_HighSchool              0.645            0.213          0.159             0.323        0.225          0.060
+         InVS13_Workplace              0.529            0.477          0.216             0.542        0.333          0.296
+         InVS15_Workplace              0.813            0.479          0.359             0.575        0.618          0.465
+          SFHH_Conference              0.847            0.571          0.560             0.519        0.578          0.430
+          HT09_Conference              0.790            0.226          0.434             0.607        0.547          0.599
+        Infectious_Museum              0.746            0.435          0.142             0.304        0.095         -0.055
+           Malawi_Village              0.900            0.733          0.917             0.367        0.083         -0.193
+         Kenya_Households              0.667            0.722          0.722             0.778        0.556          0.085
+        Utah_MiddleSchool              0.686            0.259          0.512             0.640        0.295          0.232
+    Utah_ElementarySchool              0.759            0.519          0.492             0.397       -0.178         -0.059
+     Utah_MiddleSchool_1m              0.439            0.073          0.337             0.640        0.250          0.366
+ Utah_ElementarySchool_1m              0.593            0.337          0.319             0.530        0.034          0.037
+            Copenhagen_BT              0.621            0.271          0.280             0.448        0.239          0.198
+         RealityMining_BT              0.895            0.556          0.801             0.754        0.579          0.373
+         Haggle_Infocom05              0.913            0.816          0.782             0.890        0.674          0.510
+      LH10_Hospital_Coloc              0.319           -0.011         -0.011             0.319        0.495          0.495
+   InVS13_Workplace_Coloc              0.848            0.427          0.567             0.544       -0.041         -0.141
+   InVS15_Workplace_Coloc              0.798            0.599          0.546             0.739        0.251          0.300
+    SFHH_Conference_Coloc              0.835            0.713          0.760             0.787        0.556          0.223
+ LyonSchool_Primary_Coloc              0.668           -0.472          0.638             0.715        0.397          0.104
+Thiers13_HighSchool_Coloc              0.288           -0.082          0.193             0.394        0.043          0.011
+         Thiers13_Diaries              0.826            0.565          0.667             0.612        0.210          0.210
+MEAN tau20: {'Hybrid G-L (ours)': np.float64(0.71), 'Prev. Deep 6-Ch': np.float64(0.383), 'W-Eigenvector': np.float64(0.47), 'Strength (W-Deg)': np.float64(0.575), 'W-Closeness': np.float64(0.315), 'W-Betweenness': np.float64(0.221)}
