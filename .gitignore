@@ -30,3 +30,4 @@ Datasets/
 # Fourth phase: keep processed contact networks and summaries, skip raw downloads (re-downloadable, ~600 MB)
 !fourth_phase/datasets/
 fourth_phase/datasets/raw/
+fourth_phase/block*/cache/
